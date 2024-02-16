@@ -1,0 +1,4141 @@
+---
+title: "dCA2 Integration"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+
+```{r}
+library(Seurat)
+library(dplyr)
+library(magrittr)
+library("ggplot2")
+library(grid)
+library(reshape2)
+library("scales")
+```
+
+dCA2 Male GFP positive sample 
+```{r}
+#attach data for Male GFP positive sample (sample_1_dCA2_M)
+#get working directory 
+getwd()
+#Set working directory where data file located
+setwd("/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_1_dCA2_M")
+#check folder and list files 
+list.files("/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_1_dCA2_M")
+#Load M1_GFPve_pos data
+dCA2_M1_GFPve_pos_barcodes.data <- Read10X(data.dir = "/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_1_dCA2_M")
+colnames(dCA2_M1_GFPve_pos_barcodes.data) = paste0(colnames(dCA2_M1_GFPve_pos_barcodes.data),"dCA2_MI_GFPve_pos")
+#check dimension for data
+dim(dCA2_M1_GFPve_pos_barcodes.data)
+#Initialize the Seurat object with the raw (non-normalized data).
+dCA2_MI_GFPve_pos <- CreateSeuratObject(counts = dCA2_M1_GFPve_pos_barcodes.data, project = "dCA2", min.cells = 3, min.features = 200)
+#only genes that are are expressed in 3 or more cells and cells with complexity of 200 genes or more
+dCA2_MI_GFPve_pos@meta.data$protocol<- "dCA2_Mpos"
+
+```
+
+```{r}
+#How many genes are you left with? How many cells?
+dim(dCA2_MI_GFPve_pos)
+```
+
+```{r}
+#UMI reads detected per cell
+summary(dCA2_MI_GFPve_pos$nCount_RNA)
+```
+
+```{r}
+#genes detected per cell
+summary(dCA2_MI_GFPve_pos$nFeature_RNA)
+```
+
+
+
+dCA2 Female GFP positive sample
+```{r}
+#attach data for Female GFP positive sample (sample_2_dCA2_F)
+#get working directory 
+getwd()
+#Set working directory where data file located
+setwd("/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_2_dCA2_F")
+#check folder and list files 
+list.files("/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_2_dCA2_F")
+#Load M1_GFPve_pos data
+dCA2_FI_GFPve_pos_barcodes.data <- Read10X(data.dir = "/Users/suhyunlee/Desktop/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/sample_2_dCA2_F")
+colnames(dCA2_FI_GFPve_pos_barcodes.data) = paste0(colnames(dCA2_FI_GFPve_pos_barcodes.data),"dCA2_FI_GFPve_pos")
+#check dimension for data
+dim(dCA2_FI_GFPve_pos_barcodes.data)
+#Initialize the Seurat object with the raw (non-normalized data).
+dCA2_FI_GFPve_pos <- CreateSeuratObject(counts = dCA2_FI_GFPve_pos_barcodes.data, project = "dCA2", min.cells = 3, min.features = 200)
+dCA2_FI_GFPve_pos@meta.data$protocol <- "dCA2_Fpos"
+```
+
+
+```{r}
+#How many genes are you left with? How many cells?
+dim(dCA2_FI_GFPve_pos)
+```
+
+```{r}
+#UMI reads detected per cell
+summary(dCA2_FI_GFPve_pos$nCount_RNA)
+```
+
+```{r}
+#genes detected per cell
+summary(dCA2_FI_GFPve_pos$nFeature_RNA)
+```
+
+
+FC male GFP positive
+```{r}
+#attach data for Male GFP positive sample (sample_1_FC_M)
+#get working directory 
+getwd()
+#Set working directory where data file located
+setwd("/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_1_FC_M")
+#check folder and list files 
+list.files("/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_1_FC_M")
+#Load M1_GFPve_pos data
+FC_M1_GFPve_pos_barcodes.data <- Read10X(data.dir = "/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_1_FC_M")
+colnames(FC_M1_GFPve_pos_barcodes.data) = paste0(colnames(FC_M1_GFPve_pos_barcodes.data),"FC_MI_GFPve_pos")
+#check dimension for data
+dim(FC_M1_GFPve_pos_barcodes.data)
+#Initialize the Seurat object with the raw (non-normalized data).
+FC_MI_GFPve_pos <- CreateSeuratObject(counts = FC_M1_GFPve_pos_barcodes.data, project = "dCA2", min.cells = 3, min.features = 200)
+#only genes that are are expressed in 3 or more cells and cells with complexity of 200 genes or more
+FC_MI_GFPve_pos@meta.data$protocol<- "FC_Mpos"
+
+```
+
+```{r}
+#How many genes are you left with? How many cells?
+dim(FC_MI_GFPve_pos)
+```
+
+```{r}
+#UMI reads detected per cell
+summary(FC_MI_GFPve_pos$nCount_RNA)
+```
+
+```{r}
+#genes detected per cell
+summary(FC_MI_GFPve_pos$nFeature_RNA)
+```
+
+```{r}
+#How much memory does a sparse matrix take up relative to a dense matrix
+object.size(FC_M1_GFPve_pos_barcodes.data)
+object.size(as.matrix(FC_M1_GFPve_pos_barcodes.data))
+```
+
+```{r}
+#Filtering low-quality cells
+#Look at the summary counts for genes and cells
+counts_per_cell <- Matrix::colSums(FC_M1_GFPve_pos_barcodes.data)
+cat("counts per cell: ", counts_per_cell[1:5], "\n") ## counts for first 5 cells
+```
+
+```{r}
+counts_per_gene <- Matrix::rowSums(FC_M1_GFPve_pos_barcodes.data)
+cat("counts per gene: ", counts_per_gene[1:5], "\n")  ## counts for first 5 genes
+```
+
+```{r}
+genes_per_cell <- Matrix::colSums(FC_M1_GFPve_pos_barcodes.data > 0) # count gene only if it has non-zero reads mapped.
+cat("counts for non-zero genes: ", genes_per_cell[1:5])  ## counts for first 5 genes
+```
+
+```{r}
+hist(log10(counts_per_cell+1),main='counts per cell',col='wheat')
+```
+
+```{r}
+hist(log10(genes_per_cell+1), main='genes per cell', col='wheat')
+```
+
+```{r}
+plot(counts_per_cell, genes_per_cell, log='xy', col='wheat')
+title('counts vs genes per cell')
+```
+
+```{r}
+#plot cells ranked by their number of detected genes
+#Here we rank each cell by its library complexity, ie the number of genes detected per cell. This is a very useful plot as it shows the distribution of library complexity in the sequencing run. One can use this plot to investigate observations (potential cells) that are actually failed libraries (lower end outliers) or observations that are cell doublets (higher end outliers).
+plot(sort(genes_per_cell), xlab='cell', log='y', main='genes per cell (ordered)')
+```
+
+FC Female GFP positive
+```{r}
+#attach data for Female GFP positive sample (sample_2_FC_F)
+#get working directory 
+getwd()
+#Set working directory where data file located
+setwd("/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_2_FC_F")
+#check folder and list files 
+list.files("/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_2_FC_F")
+#Load M1_GFPve_pos data
+FC_FI_GFPve_pos_barcodes.data <- Read10X(data.dir = "/Users/suhyunlee/Desktop/R_project/FC_SUN1GFP_MYC_042021_OUTPUT/sample_2_FC_F")
+colnames(FC_FI_GFPve_pos_barcodes.data) = paste0(colnames(FC_FI_GFPve_pos_barcodes.data),"FC_FI_GFPve_pos")
+#check dimension for data
+dim(FC_FI_GFPve_pos_barcodes.data)
+#Initialize the Seurat object with the raw (non-normalized data).
+FC_FI_GFPve_pos <- CreateSeuratObject(counts = FC_FI_GFPve_pos_barcodes.data, project = "dCA2", min.cells = 3, min.features = 200)
+FC_FI_GFPve_pos@meta.data$protocol <- "FC_Fpos"
+```
+
+```{r}
+#How many genes are you left with? How many cells?
+dim(FC_FI_GFPve_pos)
+```
+
+```{r}
+#UMI reads detected per cell
+summary(FC_FI_GFPve_pos$nCount_RNA)
+```
+
+```{r}
+#genes detected per cell
+summary(FC_FI_GFPve_pos$nFeature_RNA)
+```
+
+
+
+```{r}
+mito.features <- grep(pattern = "^mt-", x = rownames(x = dCA2_MI_GFPve_pos), value = TRUE)
+percent.mito <- Matrix::colSums(x = GetAssayData(object = dCA2_MI_GFPve_pos, slot = 'counts')[mito.features, ]) / Matrix::colSums(x = GetAssayData(object = dCA2_MI_GFPve_pos, slot = 'counts'))
+dCA2_MI_GFPve_pos[['percent.mito']] <- percent.mito
+```
+
+```{r}
+mito.features <- grep(pattern = "^mt-", x = rownames(x = dCA2_FI_GFPve_pos), value = TRUE)
+percent.mito <- Matrix::colSums(x = GetAssayData(object = dCA2_FI_GFPve_pos, slot = 'counts')[mito.features, ]) / Matrix::colSums(x = GetAssayData(object = dCA2_FI_GFPve_pos, slot = 'counts'))
+dCA2_FI_GFPve_pos[['percent.mito']] <- percent.mito
+```
+
+```{r}
+mito.features <- grep(pattern = "^mt-", x = rownames(x = FC_MI_GFPve_pos), value = TRUE)
+percent.mito <- Matrix::colSums(x = GetAssayData(object = FC_MI_GFPve_pos, slot = 'counts')[mito.features, ]) / Matrix::colSums(x = GetAssayData(object = FC_MI_GFPve_pos, slot = 'counts'))
+FC_MI_GFPve_pos[['percent.mito']] <- percent.mito
+```
+
+```{r}
+mito.features <- grep(pattern = "^mt-", x = rownames(x = FC_FI_GFPve_pos), value = TRUE)
+percent.mito <- Matrix::colSums(x = GetAssayData(object = FC_FI_GFPve_pos, slot = 'counts')[mito.features, ]) / Matrix::colSums(x = GetAssayData(object = FC_FI_GFPve_pos, slot = 'counts'))
+FC_FI_GFPve_pos[['percent.mito']] <- percent.mito
+```
+
+```{r}
+dCA2_MI_GFPve_pos <- subset(x = dCA2_MI_GFPve_pos, subset = nCount_RNA > 700 & nCount_RNA < 15000 & percent.mito < 0.20)
+dCA2_FI_GFPve_pos <- subset(x = dCA2_FI_GFPve_pos, subset = nCount_RNA > 700 & nCount_RNA < 15000 & percent.mito < 0.20)
+FC_MI_GFPve_pos <- subset(x = FC_MI_GFPve_pos, subset = nCount_RNA > 700 & nCount_RNA < 15000 & percent.mito < 0.20)
+FC_FI_GFPve_pos <- subset(x = FC_FI_GFPve_pos, subset = nCount_RNA > 700 & nCount_RNA < 15000 & percent.mito < 0.20)
+```
+
+
+```{r}
+dCA2_MI_GFPve_pos<- NormalizeData(object = dCA2_MI_GFPve_pos,verbose = FALSE) 
+dCA2_FI_GFPve_pos<- NormalizeData(object = dCA2_FI_GFPve_pos,verbose = FALSE)
+FC_MI_GFPve_pos<- NormalizeData(object = FC_MI_GFPve_pos,verbose = FALSE) 
+FC_FI_GFPve_pos<- NormalizeData(object = FC_FI_GFPve_pos,verbose = FALSE)
+```
+
+
+nfeatures increaed from 2000 to 5000 in order to detect rarely expressed genes. default = 2000
+```{r}
+dCA2_MI_GFPve_pos<- FindVariableFeatures(object =dCA2_MI_GFPve_pos,selection.method = "vst", nfeatures = 5000, verbose = FALSE)
+dCA2_FI_GFPve_pos<- FindVariableFeatures(object =dCA2_FI_GFPve_pos,selection.method = "vst", nfeatures = 5000, verbose = FALSE)
+FC_MI_GFPve_pos<- FindVariableFeatures(object =FC_MI_GFPve_pos,selection.method = "vst", nfeatures = 5000, verbose = FALSE)
+FC_FI_GFPve_pos<- FindVariableFeatures(object =FC_FI_GFPve_pos,selection.method = "vst", nfeatures = 5000, verbose = FALSE)
+```
+
+
+```{r}
+#integration of multiple groups using vector (x, y=c(1,2) and split by group. 
+dCA2.combined = merge(dCA2_MI_GFPve_pos, y = c(dCA2_FI_GFPve_pos, FC_MI_GFPve_pos, FC_FI_GFPve_pos), add.cell.ids = c("dCA2_Mpos", "dCA2_Fpos", "FC_Mpos", "FC_Fpos"), project = "protocol" )
+```
+
+```{r}
+dCA2.list <-SplitObject(dCA2.combined, split.by = "protocol")
+reference.list <-dCA2.list[c("dCA2_Mpos", "dCA2_Fpos","FC_Mpos", "FC_Fpos")]
+dCA2.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+```
+
+```{r}
+#intgrated analysis 
+dCA2.integrated <-IntegrateData(anchorset = dCA2.anchors, dims = 1:30)
+```
+
+
+```{r}
+#How many genes are you left with? How many cells?
+dim(dCA2.integrated)
+```
+
+```{r}
+#UMI reads detected per cell
+summary(dCA2.integrated$nCount_RNA)
+```
+
+```{r}
+#genes detected per cell
+summary(dCA2.integrated$nFeature_RNA)
+```
+
+
+```{r}
+str(dCA2.integrated)
+```
+
+```{r}
+str(MI_GFPve_pos)
+```
+
+```{r}
+#median genes/cell
+median(dCA2.integrated@meta.data$nFeature_RNA)
+```
+
+
+```{r}
+dim(dCA2.integrated)
+```
+
+
+```{r}
+library(ggplot2)
+library(cowplot)
+```
+
+```{r}
+DefaultAssay(dCA2.integrated) <- "integrated" # you can switch back and forth with RNA
+```
+
+```{r}
+set.seed(1234)
+```
+
+```{r}
+dCA2.integrated <- ScaleData(object = dCA2.integrated, vars.to.regress = c("nCount_RNA", "percent.mito"),verbose = FALSE)
+```
+
+```{r}
+dCA2.integrated <- RunPCA(object = dCA2.integrated, npcs = 50, verbose = FALSE)# npcs 50 default
+```
+
+
+```{r}
+mat <- GetAssayData(dCA2.integrated, slot = "scale.data")
+pca <- dCA2.integrated[["pca"]]
+total_variance <- sum(matrixStats::rowVars(mat))
+eigValues = (pca@stdev)^2  ## EigenValues
+varExplained = (eigValues / total_variance)*100
+plot(varExplained,type='l')
+```
+
+
+```{r}
+dCA2.integrated <- RunPCA(object = dCA2.integrated, npcs = 30, verbose = FALSE)# npcs 50 default
+```
+
+
+```{r}
+dCA2.integrated <- RunUMAP(object = dCA2.integrated, reduction = "pca", dims = 1:30)
+```
+
+```{r}
+#highlight GFP positive male dCA2 population 
+p1 <- DimPlot(object = dCA2.integrated, reduction = "umap", group.by = "protocol")
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/UMAP.pdf",width=10,height=10)
+
+```
+
+```{r}
+p1<-DimPlot(dCA2.integrated, reduction = "umap", split.by = "protocol")
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/UMAP_split.pdf",width=10,height=10)
+```
+
+
+```{r}
+#integrated analysis
+dCA2.integrated <- FindNeighbors(object = dCA2.integrated)
+```
+
+```{r}
+dCA2.integrated <- FindClusters(dCA2.integrated, resolution = 0.3, dims.use = 1:30)
+```
+
+```{r}
+#clustering by population 
+p1<-DimPlot(object = dCA2.integrated, reduction = "umap", group.by = "integrated_snn_res.0.3", label = TRUE, repel = TRUE)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clustering.pdf",width=10,height=10)
+
+```
+
+```{r}
+#clustering by population 
+p1<-DimPlot(object = dCA2.integrated, reduction = "umap", group.by = "integrated_snn_res.0.3", label = TRUE, repel = TRUE, split.by = "protocol")
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clustering_split.pdf",width=10,height=10)
+```
+
+
+#######################cluster tree code####################################################################################
+Building a cluster tree for the clusters
+
+```{r}
+install.packages('ape')
+```
+
+```{r}
+library('ape')
+```
+
+
+```{r}
+#cluster tree to go with the violin plot based on cell type 
+pdf(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree.pdf",width=20,height=8,paper='special') 
+#https://www.rdocumentation.org/packages/ape/versions/5.2/topics/plot.phylo
+dCA2.integrated <- BuildClusterTree(dCA2.integrated, verbose = FALSE, reorder = FALSE)
+plot(dCA2.integrated@tools$BuildClusterTree, type = "phylogram", edge.color = "black", edge.width = 4,edge.lty = 1, srt = 0, label.offset = 10, direction = "downwards", tip.color = "black")
+dev.off()
+```
+
+
+
+
+##############################################################
+
+###########################doublet code#####################################################################################
+Remove doublet before sample integration. 
+
+```{r}
+install.packages("scDblfinder")
+```
+
+converting seurat object to sce object 
+https://satijalab.org/seurat/archive/v3.0/conversion_vignette.html
+
+Doublet removal
+```{r}
+BiocManager::install("scDblFinder")
+library(scDblFinder)
+library(scater)
+library(SingleCellExperiment)
+library(Seurat)
+library(scDblFinder)
+library(scuttle)
+```
+
+```{r}
+# prepare object to inspect for doublet clusters
+DefaultAssay(dCA2.integrated) <- "RNA"
+sce.object <- as.SingleCellExperiment(dCA2.integrated)
+colLabels(sce.object) <- colData(sce.object)$ident
+dbl.out <- findDoubletClusters(sce.object,colLabels(sce.object))
+```
+
+```{r}
+# outlier clusters by number of significant genes (num.de)
+rownames(dbl.out)[isOutlier(dbl.out$num.de, log=TRUE, type="lower")]
+```
+
+```{r}
+# outlier clusters by number of significant genes (num.de)
+rownames(dbl.out)[dbl.out$lib.size1 < 1 & dbl.out$lib.size2 < 1]
+```
+
+
+```{r}
+# be sure to reset your defualt assay back
+DefaultAssay(dCA2.integrated) <- "integrated"
+ 
+```
+
+################################################dCA2 Markers####################################################################
+
+Feature plot highlighting dCA2 markers in all population 
+Expression pots in UMAP space illustrating normalized expression values of dCA2 markers 
+
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Rgs14"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Rgs14.pdf",width=10,height=10)
+```
+
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("CREREV38354884"), min.cutoff = 0, max.cutoff = 1.5 )
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/CREREV38354884.pdf",width=10,height=10)
+```
+
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("GFP"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/GFP.pdf",width=10,height=10)
+```
+
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Avpr1b"), min.cutoff = 0, max.cutoff = 1.5)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Avpr1b.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Amigo2"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Amigo2.pdf",width=10,height=10)
+```
+
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Map3k15"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Map3k15.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Actn2"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Actn2.pdf",width=10,height=10)
+```
+
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Ptpn5"), min.cutoff = 0,max.cutoff = 3) 
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Ptpn5.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Cacng5"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Cacng5.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Oxtr"), min.cutoff = 0, max.cutoff = 1.5)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Oxtr.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Pcp4"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Pcp4.pdf",width=10,height=10)
+```
+
+sodium channel 
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn1a"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN1A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn2a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN2A.pdf",width=10,height=10)
+```
+
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn3a"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN3A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn4a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN4A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn8a"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN8A.pdf",width=10,height=10)
+```
+
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn9a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN9A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn5a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN5A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn10a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN10A.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting dCA2 markers in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Scn11a"), min.cutoff = 0, max.cutoff = 3)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/SCN11A.pdf",width=10,height=10)
+```
+
+###############################################################################################
+##############################potassium channel##########################
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcna1"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcna1.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcna2"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcna2.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcna3"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcna3.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcna4"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcna4.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcna6"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcna6.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnb1"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnb1.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnb2"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnb2.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnc1"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnc1.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnc2"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnc2.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnc3"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnc3.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnc4"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnc4.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnd1"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnd1.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnd2"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnd2.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnd3"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnd3.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnq2"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnq2.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnq3"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnq3.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting potassium channel in all population 
+p1<-FeaturePlot(object =dCA2.integrated, features = c("Kcnq5"), min.cutoff = 0)
+plot_grid(p1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Kcnq5.pdf",width=10,height=10)
+```
+
+
+
+
+
+
+
+##############################################################################################################################
+
+Assign clusters types 
+```{r}
+#celltypes asigned based on that gene marker expression
+new.ident <- c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9")
+names(x = new.ident) <- levels(x =dCA2.integrated)
+dCA2.integrated<- RenameIdents(object =dCA2.integrated, new.ident)
+```
+
+```{r}
+color<-c("#19647e","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#4b3f72")
+```
+
+```{r}
+DimPlot(object = dCA2.integrated, reduction = "umap", label = FALSE, repel = TRUE,cols=color,label.size = 12,pt.size=0.5) 
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Neuronaltype.pdf",width=10,height=7)
+```
+
+```{r}
+DimPlot(object = dCA2.integrated, reduction = "umap", label = TRUE, repel = TRUE) 
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Neuronaltype.pdf",width=10,height=10)
+```
+
+############################################################################
+Identification of all markers for each cluster
+see 
+https://hbctraining.github.io/scRNA-seq/lessons/sc_exercises_integ_marker_identification.html
+
+This analysis compares each cluster against all others and outputs the genes that are differentially expressed/present using the FindAllMarkers() function.
+
+For different DEG functions read
+
+https://www.biostars.org/p/409790/
+
+```{r}
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+combined_markers <- FindAllMarkers(object = dCA2.integrated, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+View(combined_markers)        
+
+# Save markers to file
+write.csv(combined_markers, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers1.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+```
+
+We can also output the top 5 markers by log2 fold change for each cluster for a quick perusal.
+```{r}
+# Extract top 50 markers per cluster
+top50_comb <- combined_markers %>%
+        group_by(cluster) %>%
+        top_n(n = 50,
+              wt = avg_log2FC)
+
+# Visualize top 50 markers per cluster
+View(top50_comb)
+
+# Save markers to file
+write.csv(combined_markers, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/top50_markers1.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+
+
+```
+
+
+
+##############################################################################
+Heatmap for different cell types from combined markers
+
+DoHeatmap generates an expression heatmap for given cells and features. In this case, we are plotting the top 20 markers (or all markers if less than 20) for each cluster.
+https://satijalab.org/seurat/archive/v3.2/pbmc3k_tutorial.html
+
+```{r}
+combined_markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(dCA2.integrated, features = top10$gene) + NoLegend()
+
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/heatmap_top10_celltype1.pdf",width=50,height=25, limitsize = FALSE)
+```
+
+#########################################################
+Dot plot for Top 10 markers from combined markers
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+features <- c("Man1a2", "Kcnk2", "Akap13", "Asph", "Ptpn5", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Stxbp5l", "Rapgef5", "Dapk1", "Ntsr2", "Epha10", "Hdac7", "St8sia6", "Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Neto1", "Cpeb1", "Parp8", "Nptx1", "Cdh24", "Slit2", "C1ql3", "Adarb2", "Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Cdh13", "Cit", "Cald1", "Ptgds", "Car2", "Lcorl", "Smad7", "Septin7", "Il1rap", "Ptn", "Tac1", "Zfp536", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Nr4a3", "Zdbf2", "Chgb", "Tent5a", "Adamts1", "Scg2", "Atp1a2", "Slc1a3", "Apoe", "Clu", "Ntm", "Cspg5", "Slc1a2", "Cst3", "Ptprz1", "Ttr", "Gjc3", "Mbp", "Mobp", "Plp1", "Septin4", "Mag", "Qk", "Mal", "Trf", "Rgs9", "Meis2", "Fnbp1l", "Cpne5", "Grid2", "Gnal", "Gprin3")
+```
+
+```{r}
+DotPlot(dCA2.integrated, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+
+################################################################
+
+Tabulate cells by cluster ID, replicate, or both
+
+see https://satijalab.org/seurat/archive/v3.0/interaction_vignette.html
+
+
+```{r}
+# How many cells are in each cluster
+table(Idents(dCA2.integrated))
+```
+
+```{r}
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6","Type7", "Type8", "Type9"),
+  value = c(1830, 1746, 886, 635, 428, 176, 173, 35, 19)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_cluster_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+# How many cells are in each group?
+table(dCA2.integrated$protocol)
+```
+
+```{r}
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(1138, 1981, 1566, 1243)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_pie.pdf",width=10,height=7)
+```
+
+```{r}
+# What proportion of cells are in each cluster?
+prop.table(table(Idents(dCA2.integrated)))
+```
+
+```{r}
+# How does cluster membership vary by group?
+table(Idents(dCA2.integrated), dCA2.integrated$protocol)
+```
+
+pie graph for different cell types 
+```{r}
+#type1
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(378, 378, 652, 422)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type1_pie.pdf",width=10,height=7)
+```
+
+```{r}
+#type2
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(402, 900, 171, 273)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type2_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type3
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(268, 418, 127, 73)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type3_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type4
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(21, 101, 285, 228)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type4_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type5
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(4, 49, 164, 211)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type3_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type6
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(38, 82, 34, 22)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type6_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type7
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(8, 25, 129, 11)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type7_pie.pdf",width=10,height=7)
+```
+
+
+
+```{r}
+#type8
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(12, 16, 4, 3)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type8_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type9
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(7, 12, 0, 0)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type9_pie.pdf",width=10,height=7)
+```
+
+
+```{r}
+prop.table(table(Idents(dCA2.integrated), dCA2.integrated$protocol), margin = 2)
+```
+
+
+#########percentage within the group#####################
+
+```{r}
+#percentage of nuclei dCA2_Fpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(33.2, 35.3, 23.5, 1.84, 0.35, 3.3, 0.7, 1, 0.6)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2_Fpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2_Fpos.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei dCA2_Mpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(19.1, 45.4, 21.1, 5.1, 2.5, 4.1, 1.3, 0.8, 0.6)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2_Mpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2_Mpos.pdf",width=10,height=7)
+```
+
+```{r}
+#percentage of nuclei FC_Fpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(41.6, 10.9, 8.1, 18.2, 10.5, 2.2, 8.2, 0.3, 0)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC_Fpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC_Fpos.pdf",width=10,height=7)
+```
+
+```{r}
+#percentage of nuclei FC_Mpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(34.2, 22.1, 5.9, 18.5, 17, 1.8, 0.9, 0.2, 0)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC_Mpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC_Mpos.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei dCA2
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(24.2, 41.7, 22, 4, 1.7, 3.8, 1, 0.9, 0.6)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei FC
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"),
+  value = c(38, 16, 7.1, 18, 13, 2, 5, 0.3, 0)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC.pdf",width=10,height=7)
+```
+
+
+
+##########assigning cell type for further analysis######################
+
+```{r}
+for (i in 1:length(new.ident)){
+assign(paste(new.ident[i],"_barcode",sep=""),colnames(dCA2.integrated@assays[["RNA"]]@data[,which(Idents(object=dCA2.integrated) %in% new.ident[i])]))
+assign(paste(new.ident[i],"_barcode_dCA2_Mpos",sep=""),grep("dCA2_Mpos",eval(parse(text=paste(new.ident[i],"_barcode",sep=""))),value=TRUE))
+assign(paste(new.ident[i],"_barcode_dCA2_Fpos",sep=""),grep("dCA2_Fpos",eval(parse(text=paste(new.ident[i],"_barcode",sep=""))),value=TRUE))
+assign(paste(new.ident[i],"_barcode_FC_Mpos",sep=""),grep("FC_Mpos",eval(parse(text=paste(new.ident[i],"_barcode",sep=""))),value=TRUE))
+assign(paste(new.ident[i],"_barcode_FC_Fpos",sep=""),grep("FC_Fpos",eval(parse(text=paste(new.ident[i],"_barcode",sep=""))),value=TRUE))
+}
+```
+
+```{r}
+Type1_barcode_dCA2 <-c(Type1_barcode_dCA2_Fpos, Type1_barcode_dCA2_Mpos)
+Type2_barcode_dCA2 <-c(Type2_barcode_dCA2_Fpos, Type2_barcode_dCA2_Mpos)
+Type3_barcode_dCA2 <-c(Type3_barcode_dCA2_Fpos, Type3_barcode_dCA2_Mpos)
+Type4_barcode_dCA2 <-c(Type4_barcode_dCA2_Fpos, Type4_barcode_dCA2_Mpos)
+Type5_barcode_dCA2 <-c(Type5_barcode_dCA2_Fpos, Type5_barcode_dCA2_Mpos)
+Type6_barcode_dCA2 <-c(Type6_barcode_dCA2_Fpos, Type6_barcode_dCA2_Mpos)
+Type7_barcode_dCA2 <-c(Type7_barcode_dCA2_Fpos, Type7_barcode_dCA2_Mpos)
+Type8_barcode_dCA2 <-c(Type8_barcode_dCA2_Fpos, Type8_barcode_dCA2_Mpos)
+Type9_barcode_dCA2 <-c(Type9_barcode_dCA2_Fpos, Type9_barcode_dCA2_Mpos)
+
+Type1_barcode_FC <-c(Type1_barcode_FC_Fpos, Type1_barcode_FC_Mpos)
+Type2_barcode_FC <-c(Type2_barcode_FC_Fpos, Type2_barcode_FC_Mpos)
+Type3_barcode_FC <-c(Type3_barcode_FC_Fpos, Type3_barcode_FC_Mpos)
+Type4_barcode_FC <-c(Type4_barcode_FC_Fpos, Type4_barcode_FC_Mpos)
+Type5_barcode_FC <-c(Type5_barcode_FC_Fpos, Type5_barcode_FC_Mpos)
+Type6_barcode_FC <-c(Type6_barcode_FC_Fpos, Type6_barcode_FC_Mpos)
+Type7_barcode_FC <-c(Type7_barcode_FC_Fpos, Type7_barcode_FC_Mpos)
+Type8_barcode_FC <-c(Type8_barcode_FC_Fpos, Type8_barcode_FC_Mpos)
+Type9_barcode_FC <-c(Type9_barcode_FC_Fpos, Type9_barcode_FC_Mpos)
+```
+
+
+################ use this dCA2_barcode and FC_barcode to compare between dCA2 and FC sample ##################### 
+
+```{r}
+dCA2_barcode <-c(Type1_barcode_dCA2, Type2_barcode_dCA2, Type3_barcode_dCA2, Type4_barcode_dCA2, Type5_barcode_dCA2, Type6_barcode_dCA2, Type7_barcode_dCA2, Type8_barcode_dCA2, Type9_barcode_dCA2)
+FC_barcode <-c(Type1_barcode_FC, Type2_barcode_FC, Type3_barcode_FC, Type4_barcode_FC, Type5_barcode_FC, Type6_barcode_FC, Type7_barcode_FC, Type8_barcode_FC, Type9_barcode_FC)
+```
+
+```{r}
+saveRDS(dCA2_barcode, file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dCA2_barcode_id.rds")
+saveRDS(FC_barcode, file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_barcode_id.rds")
+```
+
+
+Cell type for further analysis of cluster type markers 
+```{r}
+Type1_barcode <-c(Type1_barcode_dCA2_Fpos, Type1_barcode_dCA2_Mpos, Type1_barcode_FC_Fpos, Type1_barcode_FC_Mpos)
+Type2_barcode <-c(Type2_barcode_dCA2_Fpos, Type2_barcode_dCA2_Mpos, Type2_barcode_FC_Fpos, Type2_barcode_FC_Mpos)
+Type3_barcode <-c(Type3_barcode_dCA2_Fpos, Type3_barcode_dCA2_Mpos, Type3_barcode_FC_Fpos, Type3_barcode_FC_Mpos)
+Type4_barcode <-c(Type4_barcode_dCA2_Fpos, Type4_barcode_dCA2_Mpos, Type4_barcode_FC_Fpos, Type4_barcode_FC_Mpos)
+Type5_barcode <-c(Type5_barcode_dCA2_Fpos, Type5_barcode_dCA2_Mpos, Type5_barcode_FC_Fpos, Type5_barcode_FC_Mpos)
+Type6_barcode <-c(Type6_barcode_dCA2_Fpos, Type6_barcode_dCA2_Mpos, Type6_barcode_FC_Fpos, Type6_barcode_FC_Mpos)
+Type7_barcode <-c(Type7_barcode_dCA2_Fpos, Type7_barcode_dCA2_Mpos, Type7_barcode_FC_Fpos, Type7_barcode_FC_Mpos)
+Type8_barcode <-c(Type8_barcode_dCA2_Fpos, Type8_barcode_dCA2_Mpos, Type8_barcode_FC_Fpos, Type8_barcode_FC_Mpos)
+Type9_barcode <-c(Type9_barcode_dCA2_Fpos, Type9_barcode_dCA2_Mpos, Type9_barcode_FC_Fpos, Type9_barcode_FC_Mpos)
+
+```
+
+
+
+############################################################################################
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+
+Violinplot for dCA2 markers, figure goes with cluster tree  
+```{r}
+
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("Rgs14" ,"Avpr1b","Amigo2", "Map3k15","Actn2", "Ptpn5", "Cacng5","Oxtr", "Pcp4")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+P8
+P9
+
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_CJ.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+##########################
+
+#########violin plot for Sodium channels #####################
+Violinplot for sodium channels, figure goes with cluster tree  
+```{r}
+
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("Scn1a" ,"Scn2a","Scn3a", "Scn8a","Scn9a")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_sodium_channel.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+#################################
+
+#########violin plot for Potassium channels #####################
+Violinplot for potassium channels, figure goes with cluster tree  
+Kcna and Kcnb potassium channel
+
+```{r}
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("Kcna1","Kcna2", "Kcna3", "Kcna4", "Kcna6", "Kcnb1", "Kcnb2")
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_potassium_channel_kcna_kcnb.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+##########################################
+KCNC and KCND postassium channels
+
+Violinplot for potassium channels, figure goes with cluster tree  
+```{r}
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("Kcnc1","Kcnc2", "Kcnc3", "Kcnc4", "Kcnd1", "Kcnd2", "Kcnd3")
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_potassium_channel_kcnc_kcnd.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+#####################################################################
+Kcnq
+Violinplot for potassium channels, figure goes with cluster tree  
+```{r}
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("Kcnq2","Kcnq3", "Kcnq5")
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_potassium_channel_kcnq.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+###############################################################################
+
+"CREREV38354884", "GFP","Rgs14", "Avpr1b", "Amigo2", "Map3k15", "Actn2", "Ptpn5", "Cacng5", "Oxtr", "Pcp4"
+
+Violinplot for dCA2 markers, figure goes with cluster tree  
+```{r}
+
+Cell_type<-rev(c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9"))
+gene_list<-c("C1ql3" ,"Adarb2","Ptchd4", "Mef2c","Cit")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated@assays$RNA@data[gene_list,Idents(dCA2.integrated)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_MEF4c.pdf",".png",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+
+
+####################################################################################
+
+UMI plot for each cluster 
+Identifying conserved markers for each clusters
+```{r}
+install.packages("xlsx")
+```
+
+```{r}
+install.packages("rJava",type='source')
+```
+
+```{r}
+library("rJava")
+```
+
+
+```{r}
+library("xlsx")
+```
+
+```{r}
+install.packages("metap")
+```
+
+```{r}
+BiocManager::install('multtest')
+```
+
+```{r}
+library("metap")
+```
+
+
+```{r}
+#divide by avarage read number
+length(Type1_barcode)/10000
+length(Type2_barcode)/10000
+length(Type3_barcode)/10000
+length(Type4_barcode)/10000
+length(Type5_barcode)/10000
+length(Type6_barcode)/10000
+length(Type7_barcode)/10000
+length(Type8_barcode)/10000
+length(Type9_barcode)/10000
+
+```
+
+```{r}
+type<-numeric()
+for (i in 1:dim(dCA2.integrated@meta.data)[1]){
+if(rownames(dCA2.integrated@meta.data)[i] %in% Type1_barcode){type[i]<-"Type1"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type2_barcode){type[i]<-"Type2"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type3_barcode){type[i]<-"Type3"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type4_barcode){type[i]<-"Type4"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type5_barcode){type[i]<-"Type5"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type6_barcode){type[i]<-"Type6"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type7_barcode){type[i]<-"Type7"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type8_barcode){type[i]<-"Type8"}
+else if(rownames(dCA2.integrated@meta.data)[i] %in% Type9_barcode){type[i]<-"Type9"}
+else{type[i]<-"NA"}
+}
+dCA2.integrated@meta.data$type<-type
+```
+
+
+```{r}
+colors<-c("Type1"="#19647e","Type2"="#ffc857","Type3"="#9B0C1E","Type4"="#4b3f72","Type5"="#ffc857","Type6"="#676833", "Type7"="#19647e","Type8"="#ffc857", "Type9"="#9B0C1E")
+```
+
+
+```{r}
+subset_meta<-subset(dCA2.integrated@meta.data,type=="Type1"|type=="Type2"|type=="Type3"|type=="Type4"|type=="Type5"|type=="Type6"|type=="Type7"|type=="Type8"|type=="Type9")
+ggplot(subset_meta,aes_string(x="type",y="nCount_RNA",fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)+
+stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab("UMI")+
+theme(axis.title.x=element_blank(),axis.text.y=element_text(size=10),axis.title.y=element_text(size=10,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=10,face="bold"),axis.title=element_text(size=15,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0,
+0,0, 0), "cm"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_UMI_count.pdf",width=10,height=7)
+```
+
+
+#######################save image .PDF#######################
+
+###################### 08.02.2021 Cell type clean ##########################################################################
+#################SubsetData: Return a subset of the Seurat object################################
+
+```{r}
+for (i in 1:length(new.ident)){assign(paste(new.ident[i],"_barcode",sep=""),colnames(dCA2.integrated@assays$RNA@data[,which(Idents(object=dCA2.integrated) %in% new.ident[i])]))}
+```
+
+```{r}
+dCA2.integrated_clean<-subset(x=dCA2.integrated,cells=c(Type1_barcode, Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode, Type7_barcode, Type8_barcode))
+```
+
+```{r}
+saveRDS(dCA2.integrated_clean, file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dCA2_integrated_clean.rds")
+```
+
+```{r}
+DimPlot(object = dCA2.integrated_clean, reduction = "umap", label = FALSE, repel = TRUE)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_Neuronaltype_clean.pdf",width=10,height=10)
+```
+
+```{r}
+p2<-DimPlot(dCA2.integrated_clean, reduction = "umap", group.by = "protocol")
+plot_grid(p2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_UMAP_clean.pdf",width=10,height=10)
+```
+
+################################################################################################################################
+#################Cleaned data set 08.02.21########################## 
+object = dCA2.integrated_clean
+
+Cluster tree 
+```{r error=TRUE}
+#cluster tree to go with the violin plot based on cell type 
+pdf(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_clean.pdf",width=20,height=8,paper='special') 
+#https://www.rdocumentation.org/packages/ape/versions/5.2/topics/plot.phylo
+dCA2.integrated_clean <- BuildClusterTree(dCA2.integrated_clean, verbose = FALSE, reorder = FALSE)
+plot(dCA2.integrated_clean@tools$BuildClusterTree, type = "phylogram", edge.color = "black", edge.width = 4,edge.lty = 1, srt = 0, label.offset = 10, direction = "downwards", tip.color = "black")
+dev.off()
+```
+
+###############################################################################
+
+Find markers for clean subsets
+
+```{r}
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+combined_markers_clean <- FindAllMarkers(object = dCA2.integrated_clean, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+View(combined_markers_clean)        
+
+# Save markers to file
+write.csv(combined_markers_clean, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+```
+
+```{r}
+# Extract top 50 markers per cluster
+top50_comb <- combined_markers_clean %>%
+        group_by(cluster) %>%
+        top_n(n = 50,
+              wt = avg_log2FC)
+
+# Visualize top 50 markers per cluster
+View(top50_comb)
+
+# Save markers to file
+write.csv(combined_markers_clean, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/top50_markers_clean.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+
+```
+
+##############################################################################
+Heatmap for different cell types from combined markers for clean 
+
+DoHeatmap generates an expression heatmap for given cells and features. In this case, we are plotting the top 20 markers (or all markers if less than 20) for each cluster.
+https://satijalab.org/seurat/archive/v3.2/pbmc3k_tutorial.html
+
+```{r}
+combined_markers_clean %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(dCA2.integrated_clean, features = top10$gene) + NoLegend()
+
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/heatmap_top10_celltype_clean.pdf",width=50,height=25, limitsize = FALSE)
+```
+
+##########################################
+Dot plot for Top 10 markers from combined markers subset clean
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+#subset clean markers 
+features <- c("Man1a2", "Kcnk2", "Akap13", "Asph", "Ptpn5", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Stxbp5l", "Rapgef5", "Dapk1", "Ntsr2", "Epha10", "Hdac7", "St8sia6", "Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Neto1", "Cpeb1", "Parp8", "Nptx1", "Cdh24", "Slit2", "C1ql3", "Adarb2", "Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Cdh13", "Cit", "Cald1", "Ptgds", "Car2", "Lcorl", "Smad7", "Septin7", "Il1rap", "Ptn", "Tac1", "Zfp536", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Nr4a3", "Zdbf2", "Chgb", "Tent5a", "Adamts1", "Scg2", "Atp1a2", "Slc1a3", "Apoe", "Clu", "Ntm", "Cspg5", "Slc1a2", "Cst3", "Ptprz1", "Ttr", "Gjc3", "Mbp", "Mobp", "Plp1", "Septin4", "Mag", "Qk", "Mal", "Trf")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+###############################################################################################################
+
+#########################subset data clean with 7 cell types only 08.03.2021#######################################
+
+
+```{r}
+for (i in 1:length(new.ident)){assign(paste(new.ident[i],"_barcode",sep=""),colnames(dCA2.integrated@assays$RNA@data[,which(Idents(object=dCA2.integrated) %in% new.ident[i])]))}
+```
+
+```{r}
+dCA2.integrated_clean_7celltype<-subset(x=dCA2.integrated,cells=c(Type1_barcode, Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode, Type7_barcode))
+```
+
+```{r}
+saveRDS(dCA2.integrated_clean_7celltype, file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dCA2_integrated_clean_7celltype.rds")
+```
+
+```{r}
+DimPlot(object = dCA2.integrated_clean_7celltype, reduction = "umap", label = FALSE, repel = TRUE, pt=1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_Neuronaltype_clean_7celltype.pdf",width=10,height=10)
+```
+
+```{r}
+library(plotly)
+```
+
+
+
+
+
+split by identity 
+see https://satijalab.org/seurat/reference/splitobject
+
+Changed width and height to make sure it fits. Check other split by plots
+```{r}
+DimPlot(object = dCA2.integrated_clean_7celltype, reduction = "umap", split.by = "ident", label = FALSE, repel = TRUE, pt=1)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_Neuronaltype_clean_7celltype_splitby.pdf", width = 25, height = 5)
+```
+
+
+
+```{r}
+p2<-DimPlot(dCA2.integrated_clean_7celltype, reduction = "umap", group.by = "protocol", pt=1)
+plot_grid(p2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_UMAP_clean_7celltypes.pdf",width=10,height=10)
+```
+
+```{r}
+p2<-DimPlot(dCA2.integrated_clean_7celltype, reduction = "umap", split.by = "protocol", pt=1)
+plot_grid(p2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_UMAP_clean_7celltypes_splot.pdf",width=10,height=10)
+```
+
+https://github.com/Dragonmasterx87/Interactive-3D-Plotting-in-Seurat-3.0.0/blob/master/3D%20UMAP%20Plotting%20v1.3.R
+
+```{r}
+# Construct a dataframe using data from your pre-clustered Seurat v3.1.1 object
+# Here 'seurat_clusters' is list of numeric cluster identities, you can find it here: yourseuratobject[["seurat_cluster"]], 
+# or yourseuratobject$seurat_clusters, where 'yourseuratobject' is a Seurat object created with Seurat v3.1.1 (works for v3.0.0 as well)
+yourseuratobject <- dCA2.integrated_clean_7celltype
+
+# Re-run UMAPs that you have accurate calculations for all UMAP(s)
+yourseuratobject <- RunUMAP(dCA2.integrated_clean_7celltype,
+                            dims = 1:10,
+                            n.components = 3L)
+
+# Extract tSNE information from Seurat Object
+umap_1 <- yourseuratobject[["umap"]]@cell.embeddings[,1]
+umap_2 <- yourseuratobject[["umap"]]@cell.embeddings[,2]
+umap_3 <- yourseuratobject[["umap"]]@cell.embeddings[,3]
+
+# Visualize what headings are called so that you can extract them to form a dataframe
+Embeddings(object = yourseuratobject, reduction = "umap")
+
+# Prepare a dataframe for cell plotting
+plot.data <- FetchData(object = yourseuratobject, vars = c("UMAP_1", "UMAP_2", "UMAP_3", "seurat_clusters"))
+
+# Make a column of row name identities (these will be your cell/barcode names)
+plot.data$label <- paste(rownames(plot.data))
+
+# Plot your data, in this example my Seurat object had 21 clusters (0-20)
+fig <- plot_ly(data = plot.data, 
+        x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, 
+        color = ~seurat_clusters, 
+        colors = c("lightseagreen",
+                   "gray50",
+                   "darkgreen",
+                   "red4",
+                   "red",
+                   "turquoise4",
+                   "black",
+                   "yellow4",
+                   "royalblue1",
+                   "lightcyan3",
+                   "peachpuff3",
+                   "khaki3",
+                   "gray20",
+                   "orange2",
+                   "royalblue4",
+                   "yellow3",
+                   "gray80",
+                   "darkorchid1",
+                   "lawngreen",
+                   "plum2",
+                   "darkmagenta"),
+        type = "scatter3d", 
+        mode = "markers", 
+        marker = list(size = 5, width=2), # controls size of points
+        text=~label, #This is that extra column we made earlier for which we will use for cell ID
+        hoverinfo="text") #When you visualize your plotly object, hovering your mouse pointer over a point shows cell names
+
+# xaxis
+axx <- list(
+  nticks = 4,
+  range = c(-10,10) #select range of xaxis
+)
+
+# yaxis
+axy <- list(
+  nticks = 4,
+  range = c(-10,10) #select range of yaxis
+)
+
+#zaxis
+axz <- list(
+  nticks = 4,
+  range = c(-10,10) #select range of zaxis
+)
+
+fig <- fig %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz))
+fig_cube <- fig %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz, aspectmode='cube')) # To maintain cubic aspect
+fig
+fig_cube
+
+```
+
+
+object = dCA2.integrated_clean_7celltype 
+
+Cluster tree 
+```{r error=TRUE}
+#cluster tree to go with the violin plot based on cell type 
+pdf(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cluster_tree_clean_7celltype.pdf",width=20,height=8,paper='special') 
+#https://www.rdocumentation.org/packages/ape/versions/5.2/topics/plot.phylo
+dCA2.integrated_clean_7celltype <- BuildClusterTree(dCA2.integrated_clean_7celltype, verbose = FALSE, reorder = FALSE)
+plot(dCA2.integrated_clean_7celltype@tools$BuildClusterTree, type = "phylogram", edge.color = "black", edge.width = 4,edge.lty = 1, srt = 0, label.offset = 10, direction = "downwards", tip.color = "black")
+dev.off()
+```
+
+Find markers for clean subsets 7 cell types
+
+############switch back to RNA for gene anysis ##################################
+
+see https://satijalab.org/seurat/archive/v3.0/immune_alignment.html
+
+switched back to RNA from integrated assay for gene analysis 08.13.21
+
+```{r}
+DefaultAssay(dCA2.integrated_clean_7celltype) <- "integrated"
+```
+
+
+```{r}
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+combined_markers_clean_7celltype <- FindAllMarkers(object = dCA2.integrated_clean_7celltype, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+View(combined_markers_clean_7celltype)        
+
+# Save markers to file
+write.csv(combined_markers_clean_7celltype, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean_7celltype.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+```
+
+```{r}
+# Extract top 50 markers per cluster
+top50_comb <- combined_markers_clean_7celltype %>%
+        group_by(cluster) %>%
+        top_n(n = 50,
+              wt = avg_log2FC)
+
+# Visualize top 50 markers per cluster
+View(top50_comb)
+
+# Save markers to file
+write.csv(combined_markers_clean_7celltype, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/top50_markers_clean_7celltypes.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+
+```
+
+##############################################################################
+Heatmap for different cell types from combined markers for clean 7 cell types 
+
+DoHeatmap generates an expression heatmap for given cells and features. In this case, we are plotting the top 20 markers (or all markers if less than 20) for each cluster.
+https://satijalab.org/seurat/archive/v3.2/pbmc3k_tutorial.html
+
+####################scale data after subsetting 08.13.21##########################
+
+```{r}
+combined_markers_clean_7celltype %>%
+    group_by(cluster) %>%
+    top_n(n = 20, wt = avg_log2FC) -> top20
+DoHeatmap(dCA2.integrated_clean_7celltype, features = top20$gene) + NoLegend()
+
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/heatmap_top20_celltype_clean_7celltypes.pdf",width=50,height=25, limitsize = FALSE)
+```
+
+##########################################
+Dot plot for Top 10 markers from combined markers subset clean 7 cell types
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+#subset clean markers 7 cell type
+features <- c("Man1a2", "Kcnk2", "Akap13", "Asph", "Ptpn5", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Stxbp5l", "Rapgef5", "Dapk1", "Ntsr2", "Epha10", "Hdac7", "St8sia6", "Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Neto1", "Cpeb1", "Parp8", "Nptx1", "Cdh24", "Slit2", "C1ql3", "Adarb2", "Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Cdh13", "Cit", "Cald1", "Ptgds","Gjc3","Mag", "Mbp", "Plp1", "Car2", "Septin7","Il1rap", "Ptn", "Tac1", "Pde10a", "Ntrk2", "Nr4a2", "Zdbf2", "Chgb", "Tent5a", "Adamts1", "Scg2", "Atp1a2", "Apoe", "Clu", "Enpp2", "Cspg5", "Slc1a2", "Cst3", "Ptprz1", "Ttr", "Qk")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean_7celltype, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean_7celltypes.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+###################################################################################################################################
+
+Dot plot for Top 10 markers from combined markers subset clean 7 cell types including genes based on RNA count 
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+#subset clean markers 7 cell type
+features <- c("Man1a2", "Kcnk2", "Akap13", "Asph", "Ptpn5", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Stxbp5l", "Rapgef5", "Dapk1", "Ntsr2", "Epha10", "Hdac7", "St8sia6", "Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Neto1", "Cpeb1", "Ifi203", "Nptx1", "Cdh24", "Slit2", "C1ql3", "Adarb2", "Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Cdh13", "Cit", "Cntn5", "Ptgds","Gjc3","Mag", "Mbp", "Plp1", "Car2", "Septin7","Il1rap", "Ptn", "Tac1", "Pde10a", "Ntrk2", "Nr4a2", "Zdbf2", "Chgb", "Tent5a", "Adamts1", "Scg2", "Atp1a2", "Apoe", "Clu", "Enpp2", "Pdgfra", "Slc1a2", "Pomc", "Ptprz1", "Ttr", "Gpr37l1")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean_7celltype, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean_7celltypes_RNAcount.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+
+
+
+
+
+
+
+#####################################################################################################################################
+
+Dot plot for Top 20 markers from combined markers subset clean 7 cell types
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+#subset clean markers 7 cell type
+features <- c("Man1a2", "Kcnk2", "Akap13", "Stxbp5l", "Ptpn5", "Ptprd", "Asph", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Zdhhc23", "Srgap2", "Rap2b", "Pycr2", "Pkp2", "mt−Cytb", "mt−Co3", "Rapgef5", "Wipf3", "Dapk1", "Adcy1", "Ntsr2", "Epha10", "Hdac7", "Echdc2", "Large1", "Atp11b", "Fat3", "Zbtb1", "St8sia6", "Fkbp5", "Dnah9","Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Cpne7", "Cpne6",  "Neto1", "Slc1a2", "Peak1", "Cpeb1", "Parp8", "Nptx1", "Raver2", "Cdh24","Slit2", "Oxr1", "Marchf1", "Scube1", "Lnx1", "Trps1", "C1ql3", "Cntn5", "Cntnap5a", "Adarb2", "Dock10","Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Ncam1","Cdh13", "Pdzd2", "Cers4","Cit", "Dgkh", "Cald1", "Bsg", "Ptgds", "Lrrtm3", "Gjc3","Mag", "Sytl2", "Cnp", "Mobp", "Mbp", "Plp1", "Car2", "Scd2", "Lcorl", "Septin4", "Smad7", "Septin7","Il1rap", "Ptn", "Qk", "Tac1", "Zfp536", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Nr4a3",  "Zdbf2", "Dclk1", "Chgb", "Fosl2", "Tent5a", "Cwc25", "Adamts1", "Btg2", "Alkal2", "Npas4", "Homer1", "Tbc1d1", "Pam","Scg2", "Atp1a2", "Slc1a3", "Apoe", "Plpp3", "Phkg1", "Clu", "Acsl3","Enpp2", "Ntm", "Cspg5", "Cst3", "Sparcl1", "Msi", "Ptprz1", "Ttyh1", "Ttr")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean_7celltype, features = features) + RotatedAxis() + scale_size(range = c(1, 10))  + FontSize(x.text = 20, y.text = 20)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean_7celltypes_Top20 genes.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+
+
+###########subset clean markers 7 cell type dotplot as list top#20 markers####################
+
+generating excel table for the 7 cell types aligned to each other 
+
+see: https://github.com/satijalab/seurat/issues/1888
+
+```{r}
+#subset clean markers 7 cell type dotplot as list top#20 markers
+ my_genes <- c("Man1a2", "Kcnk2", "Akap13", "Stxbp5l", "Ptpn5", "Ptprd", "Asph", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Zdhhc23", "Srgap2", "Rap2b", "Pycr2", "Pkp2", "mt−Cytb", "mt−Co3", "Rapgef5", "Wipf3", "Dapk1", "Adcy1", "Ntsr2", "Epha10", "Hdac7", "Echdc2", "Large1", "Atp11b", "Fat3", "Zbtb1", "St8sia6", "Fkbp5", "Dnah9","Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Cpne7", "Cpne6",  "Neto1", "Slc1a2", "Peak1", "Cpeb1", "Parp8", "Nptx1", "Raver2", "Cdh24","Slit2", "Oxr1", "Marchf1", "Scube1", "Lnx1", "Trps1", "C1ql3", "Cntn5", "Cntnap5a", "Adarb2", "Dock10","Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Ncam1","Cdh13", "Pdzd2", "Cers4","Cit", "Dgkh", "Cald1", "Bsg", "Ptgds", "Lrrtm3", "Gjc3","Mag", "Sytl2", "Cnp", "Mobp", "Mbp", "Plp1", "Car2", "Scd2", "Lcorl", "Septin4", "Smad7", "Septin7","Il1rap", "Ptn", "Qk", "Tac1", "Zfp536", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Nr4a3",  "Zdbf2", "Dclk1", "Chgb", "Fosl2", "Tent5a", "Cwc25", "Adamts1", "Btg2", "Alkal2", "Npas4", "Homer1", "Tbc1d1", "Pam","Scg2", "Atp1a2", "Slc1a3", "Apoe", "Plpp3", "Phkg1", "Clu", "Acsl3","Enpp2", "Ntm", "Cspg5", "Cst3", "Sparcl1", "Msi", "Ptprz1", "Ttyh1", "Ttr")
+a <- DotPlot(dCA2.integrated_clean_7celltype, features = my_genes)
+a$data
+
+# Save markers to file
+write.csv(a$data, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean_7celltype_avg_exp.csv", 
+          quote = TRUE, 
+          row.names = TRUE)
+```
+
+##############################################################################################################################
+
+Find markers for clean subsets 7 cell types with min.diff.pct = 0.4 and logfc.threshold = 0.4 
+
+```{r}
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+combined_markers_clean_7celltype_pctdiff0.5 <- FindAllMarkers(object = dCA2.integrated_clean_7celltype, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.4,
+                          min.diff.pct = 0.4)  
+
+View(combined_markers_clean_7celltype_pctdiff0.5)        
+
+# Save markers to file
+write.csv(combined_markers_clean_7celltype_pctdiff0.5, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean_7celltype_pctdiff0.5.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+```
+
+```{r}
+combined_markers_clean_7celltype_pctdiff0.5 %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(dCA2.integrated_clean_7celltype, features = top10$gene) + NoLegend()
+
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/heatmap_top10_celltype_clean_7celltypes_pctdiff0.5.pdf",width=50,height=25, limitsize = FALSE)
+```
+
+```{r}
+#subset clean markers 7 cell type
+features <- c("Cntn5", "Prox1", "Fnbp1l1", "Ptchd4", "Maf", "Gjc3", "Ugt8a", "Tspan2", "Mal", "Sytl2", "Car2", "Bdnf", "Cpne2", "Tcf7l2", "Plxnb1	", "Lrrtm3", "Utp14b", "Clu", "Bcas1", "Gja1", "Bcl2", "Msi2")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean_7celltype, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean_7celltypes_pctdiff0.5.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+######################################################################################################
+Cell type marker distribution
+
+```{r}
+#Tac1
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1.pdf",width=10,height=10)
+plot(F)
+```
+
+
+```{r}
+#Clu
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Clu"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Clu.pdf",width=10,height=10)
+plot(F)
+```
+
+```{r}
+#Mef2c
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Mef2c"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Mef2c.pdf",width=10,height=10)
+plot(F)
+```
+
+```{r}
+#Kcnk2
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Kcnk2"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Kcnk2.pdf",width=10,height=10)
+plot(F)
+```
+
+```{r}
+#BDNF
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Bdnf"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Bdnf.pdf",width=10,height=10)
+plot(F)
+```
+
+
+```{r}
+#Amigo2
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Amigo2"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Amigo2.pdf",width=10,height=10)
+plot(F)
+```
+
+```{r}
+#Cpne7
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Cpne7"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Cpne7.pdf",width=10,height=10)
+plot(F)
+```
+
+```{r}
+#Ccnd2
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Ccnd2"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Ccnd2.pdf",width=10,height=10)
+plot(F)
+```
+
+############################################08.05.2021###################################################################################
+Visualize co-expression of two features simultaneously
+https://satijalab.org/seurat/articles/visualization_vignette.html
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Mef2c", "Kcnk2"), blend = TRUE)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Mef2c_Kcnk2.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Kcnk2", "Amigo2"), blend = TRUE)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Kcnk2_Amigo2.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Amigo2", "Ccnd2"), blend = TRUE)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Amigo2_Ccnd2.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Nptx1", "C1ql3"), blend = TRUE, max.cutoff = 2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Nptx1_C1ql3.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Ptgds", "Atp1a2"), blend = TRUE, blend.threshold = 0.2, max.cutoff = 2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Ptgds_Apt1a2.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Ptgds", "Atp1a2"), blend = TRUE,blend.threshold = 0.1, max.cutoff = 2)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Ptgds_Apoe.pdf",width=10,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Gjc3", "Atp1a2"), blend = TRUE)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Gjc3_Apt1a2.pdf",width=10,height=10)
+```
+
+
+
+##########cell type markers hybridizing with Hiplex assay############20230521"
+```{r}
+# Visualize co-expression of two features simultaneously "type4 marker" C1ql3 and Cdh13
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("C1ql3", "Cdh13"), blend = TRUE, max.cutoff = 1.4, pt.size = 1.5)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_C1ql3_Cdh13.pdf",width=30,height=10)
+```
+
+```{r}
+# Visualize co-expression of two features simultaneously "type3 marker" Slit2 and lfi203
+FeaturePlot(dCA2.integrated_clean_7celltype, features = c("Slit2", "Ifi203"), blend = TRUE, max.cutoff = 1, pt.size = 1.5)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_merged_Slit2_Lfi203.pdf",width=30,height=10)
+```
+
+
+######################################################
+########## top celltype markers feature plot individual with Hiplex Assay ############################
+
+```{r}
+#Feature plot highlighting type 4 = C1ql3
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features = c("C1ql3"), blend.threshold = 0.1, min.cutoff = 0, max.cutoff = 1.5, pt.size =1.5) + scale_fill_continuous(type= "viridis")
+
+plot(F)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/C1ql3_clean_viridis.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting type 4 = Cdh13
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features = c("Cdh13"), blend.threshold = 1, min.cutoff = 0, max.cutoff = 1.5, pt.size =1.5) + scale_fill_continuous(type= "viridis")
+
+plot(F)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Cdh13_clean_viridis.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting type 3 = Slit2
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features = c("Slit2"), blend.threshold = 1, min.cutoff = 0, max.cutoff = 2, pt.size =1.5) + scale_fill_continuous(type= "viridis")
+
+plot(F)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Slit2_clean_viridis.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting type 3 = Ifi203
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features = c("Ifi203"), blend.threshold = 1, min.cutoff = 0, max.cutoff = 1.5, pt.size =1.5) + scale_fill_continuous(type= "viridis")
+
+plot(F)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/IFi203_clean_viridis.pdf",width=10,height=10)
+```
+
+```{r}
+#Feature plot highlighting type 7 = pgda
+F<-FeaturePlot(object =dCA2.integrated_clean_7celltype, features = c("Pdgfra"), blend.threshold = 1, min.cutoff = 0, max.cutoff = 1.5, pt.size =1.5) + scale_fill_continuous(type= "viridis")
+
+plot(F)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Pdgfra_clean_viridis.pdf",width=10,height=10)
+```
+
+
+#######################################################################################
+
+```{r}
+install.packages("RColorBrewer")
+```
+
+```{r}
+library("RColorBrewer")
+```
+
+change point size:
+see https://www.rdocumentation.org/packages/Seurat/versions/4.0.3/topics/FeaturePlot
+
+
+```{r}
+#Ccnd2
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Ccnd2"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "Spectral")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Ccnd2_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5, cols = c("pink", "red"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5, cols = c("lightblue", "red"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_blue_red_color.pdf",width=10,height=10)
+```
+
+
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "Spectral")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_color_spectral.pdf",width=10,height=10)
+```
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Cdh13", "C1ql13", "Ptgds"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt=1) + scale_fill_continuous(type= "viridis")
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Cdh13_C1ql13_Ptgds_color_viridis.pdf",width=10,height=10)
+```
+
+
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Cdh13", "C1ql3", "Ptgds"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt=1) + scale_fill_continuous(type= "viridis")
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Cdh13_C1ql13_Ptgds_color_viridis.pdf",width=10,height=10)
+```
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Slit2", "Lnx1", "Nptx1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt=1) + scale_fill_continuous(type= "viridis")
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Slit2_Lnx1_Nptx1_color_viridis.pdf",width=10,height=10)
+```
+
+##############################################################################################################################
+
+```{r}
+#cell type 1 genes
+cell_typeA_marker_gene_list <- list(c("Man1a2"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1,  min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype1marker_combined_genes.pdf",width=10,height=10)
+```
+
+```{r}
+#cell type 2 genes
+cell_typeA_marker_gene_list <- list(c("Stxbp5l"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1,  min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype2marker_combined_genes.pdf",width=10,height=10)
+```
+
+
+```{r}
+#cell type 3 genes
+cell_typeA_marker_gene_list <- list(c("Nptx1", "Slit2", "Ifi203"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1,  min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype3marker_combined_genes.pdf",width=10,height=10)
+```
+
+Note that gene list for AddModuleScore must be supplied in list class or coerced as part of function to list otherwise score will be created for each gene and not the gene set.
+Also note that you must add "1" to the end of whatever name you provided in AddModuleScore as this is automatically appended to the name provided in the new metadata column which stores the score.
+
+```{r}
+#cell type 4 genes
+cell_typeA_marker_gene_list <- list(c("C1ql3", "Cdh13", "Cntn5"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1, min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype4marker_combined_genes.pdf",width=10,height=10)
+```
+
+```{r}
+#cell type 5 genes
+cell_typeA_marker_gene_list <- list(c("Gjc3", "Ermn", "Ugt8a", "Aspa"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1, min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype5marker_combined_genes.pdf",width=10,height=10)
+```
+
+```{r}
+#cell type 6 genes
+cell_typeA_marker_gene_list <- list(c("Pde10a"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1, min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype6marker_combined_genes.pdf",width=10,height=10)
+```
+
+```{r}
+#cell type 7 genes
+cell_typeA_marker_gene_list <- list(c("Gpr37I1", "Pomc", "Pdgfra"))
+object <- AddModuleScore(object = dCA2.integrated_clean_7celltype, features = cell_typeA_marker_gene_list, name = "celltype", assay = "RNA")
+FeaturePlot(object = object, features = "celltype1", order=T, pt=1,  min.cutoff = 'q00', max.cutoff = 'q10')+ 
+  scale_color_viridis_c()
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_celltype7marker_combined_genes.pdf",width=10,height=10)
+```
+
+
+#########################################################################################################
+##################################################################
+For all the gene list combined markers for 7 cell types 08.23.2021
+All of 900 genes to vizualize best cell type markers 
+
+```{r}
+# genes of interest
+gene_df = read.csv("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FEATUREPLOT_GENELIST/Gene_64.csv", header = T)
+gene_list <- gene_df$gene
+```
+
+```{r}
+#Gene list 
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features = gene_list, blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt=0.2) + scale_fill_continuous(type= "viridis")
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FEATUREPLOT_GENELIST/gene_64.pdf", width = 10, height = 10)
+```
+
+##############################################################################################################
+###############################################################################################################
+
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdYlGn")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_color_set1.pdf",width=10,height=10)
+```
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_color_RdBu.pdf",width=10,height=10)
+```
+
+
+
+```{r}
+#Mef2c
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Mef2c"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Mef2c_color.pdf",width=10,height=10)
+```
+
+
+```{r}
+#Mef2c
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Mef2c"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5, cols = c("lightblue", "red"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Mef2c_blue_red_color.pdf",width=10,height=10)
+```
+
+
+
+
+```{r}
+#Clu
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Clu"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Clu_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Kcnk2
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Kcnk2"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Kcnk2_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Bdnf
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Bdnf"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Bdnf_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Amigo2
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Amigo2"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt.size = 1.5) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Amigo2_color.pdf",width=10,height=10)
+```
+
+```{r}
+#Ccnd2
+FeaturePlot(object =dCA2.integrated_clean_7celltype, features =  c("Ccnd2"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2) + scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu")))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Ccnd2_color.pdf",width=10,height=10)
+```
+
+
+#######################################081921#########################
+
+Cell type numbers for 7 cell types  
+
+```{r}
+# How many cells are in each cluster
+table(Idents(dCA2.integrated_clean_7celltype))
+```
+
+```{r}
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6","Type7"),
+  value = c(1830, 1746, 886, 635, 428, 176, 173)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_cluster_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+# How many cells are in each group?
+table(dCA2.integrated_clean_7celltype$protocol)
+```
+
+```{r}
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(1119, 1953, 1562, 1240)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_pie_7celltype.pdf",width=10,height=7)
+```
+
+```{r}
+# What proportion of cells are in each cluster?
+prop.table(table(Idents(dCA2.integrated_clean_7celltype)))
+```
+
+```{r}
+# How does cluster membership vary by group?
+table(Idents(dCA2.integrated_clean_7celltype), dCA2.integrated_clean_7celltype$protocol)
+```
+
+pie graph for different cell types 
+```{r}
+#type1
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(378, 378, 652, 422)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type1_pie_7celltype.pdf",width=10,height=7)
+```
+
+```{r}
+#type2
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(402, 900, 171, 273)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type2_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type3
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(268, 418, 127, 73)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type3_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type4
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(21, 101, 285, 228)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type4_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type5
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(4, 49, 164, 211)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type3_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type6
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(38, 82, 34, 22)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type6_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#type7
+df <-data.frame(
+  group = c("dCA2_Fpos", "dCA2_Mpos", "FC_Fpos", "FC_Mpos"),
+  value = c(8, 25, 129, 11)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_number_group_type7_pie_7celltype.pdf",width=10,height=7)
+```
+
+
+
+#########percentage within the group 7 cell types #####################
+
+```{r}
+#percentage of nuclei dCA2_Fpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(33.8, 35.9, 23.9, 1.9, 0.4, 3.4, 0.7)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2_Fpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2_Fpos_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei dCA2_Mpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(19.4, 46.1, 21.1, 5.1, 2.5, 4.1, 1.3)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2_Mpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2_Mpos_7celltype.pdf",width=10,height=7)
+```
+
+```{r}
+#percentage of nuclei FC_Fpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(41.7, 10.9, 8.1, 18.2, 10.5, 2.2, 8.3)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC_Fpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC_Fpos_7celltype.pdf",width=10,height=7)
+```
+
+```{r}
+#percentage of nuclei FC_Mpos
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(41.7,10.9, 8.1, 18.2, 10.5, 2.2, 8.3)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC_Mpos")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC_Mpos_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei dCA2
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(24.6, 42.4, 22.3, 4, 1.7, 3.9, 1.1)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("dCA2")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_dCA2_7celltype.pdf",width=10,height=7)
+```
+
+
+```{r}
+#percentage of nuclei FC
+df <-data.frame(
+  group = c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"),
+  value = c(38.3, 16, 7.1, 18, 13.4, 2, 5)
+)
+head(df)
+```
+
+```{r}
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")+ ggtitle("FC")
+bp
+```
+
+```{r}
+pie <- bp + coord_polar("y", start=0)
+pie
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_percentage_FC_7celltpe.pdf",width=10,height=7)
+```
+
+###############################################################################################################
+###############################################################################################################
+###########################################UMI plot for 7 cell types 08.24.21##################################
+
+
+UMI plot for each cluster 
+Identifying conserved markers for each clusters for 7 cell types
+```{r}
+library("rJava")
+```
+
+```{r}
+library("xlsx")
+```
+
+```{r}
+library("metap")
+```
+
+
+```{r}
+#divide by avarage read number
+length(Type1_barcode)/10000
+length(Type2_barcode)/10000
+length(Type3_barcode)/10000
+length(Type4_barcode)/10000
+length(Type5_barcode)/10000
+length(Type6_barcode)/10000
+length(Type7_barcode)/10000
+```
+
+```{r}
+type<-numeric()
+for (i in 1:dim(dCA2.integrated_clean_7celltype@meta.data)[1]){
+if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type1_barcode){type[i]<-"Type1"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type2_barcode){type[i]<-"Type2"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type3_barcode){type[i]<-"Type3"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type4_barcode){type[i]<-"Type4"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type5_barcode){type[i]<-"Type5"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type6_barcode){type[i]<-"Type6"}
+else if(rownames(dCA2.integrated_clean_7celltype@meta.data)[i] %in% Type7_barcode){type[i]<-"Type7"}
+else{type[i]<-"NA"}
+}
+dCA2.integrated_clean_7celltype@meta.data$type<-type
+```
+
+
+```{r}
+colors<-c("Type1"="#19647e","Type2"="#ffc857","Type3"="#9B0C1E","Type4"="#4b3f72","Type5"="#ffc857","Type6"="#676833", "Type7"="#19647e")
+```
+
+
+```{r}
+subset_meta<-subset(dCA2.integrated@meta.data,type=="Type1"|type=="Type2"|type=="Type3"|type=="Type4"|type=="Type5"|type=="Type6"|type=="Type7")
+ggplot(subset_meta,aes_string(x="type",y="nCount_RNA",fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)+
+stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab("UMI")+
+theme(axis.title.x=element_blank(),axis.text.y=element_text(size=10),axis.title.y=element_text(size=10,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=10,face="bold"),axis.title=element_text(size=15,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0,
+0,0, 0), "cm"))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cell_type_UMI_count_clean_7celltype.pdf",width=10,height=7)
+
+```
+
+######################################################################################################################################
+
+#########violin plot for 7 cell types with CA2 markers 08.24.21 #####################
+ 
+```{r}
+
+Cell_type<-rev(c("Type7", "Type4", "Type5", "Type3", "Type6", "Type1", "Type2"))
+gene_list<-c("Avpr1b" ,"Amigo2","Rgs14", "Map3k15", "Pcp4")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Violin_plot_dCA2_markers_7celltype.pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+##########################################################################################################################
+
+#########violin plot for 7 cell types with FC vs dCA2 markers 08.24.21 #####################
+ 
+```{r}
+Cell_type<-rev(c("Type7", "Type4", "Type5", "Type3", "Type6", "Type1", "Type2"))
+gene_list<-c("Mef2c","Zfp536", "Tac1", "Igfbp4", "Scn1a", "Cpne7", "Ttr")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Violin_plot_FcvsdCA2_markers_7celltype.pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+############################################################################################
+#########violin plot for 7 cell types with neurotransmitters 08.24.21 #####################
+
+```{r}
+Cell_type<-rev(c("Type7", "Type4", "Type5", "Type3", "Type6", "Type1", "Type2"))
+gene_list<-c("Gad1", "Sst", "Cck", "Pvalb","Htr3a", "Nos1","Slc17a7","Calb2")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+P8
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Violin_plot_neuronalmarker_7celltype.pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+#########violin plot for 7 cell types with cell type markers 08.24.21 #####################
+ 
+```{r}
+Cell_type<-rev(c("Type7", "Type4", "Type5", "Type3", "Type6", "Type1", "Type2"))
+gene_list<-c("Ednrb","Sox6", "Gjb6", "Cpne2", "C1ql3", "Cntn5", "Stxbp6", "Cntnap5a", "Gjc3", "Ermn", "Ugt8a", "Aspa", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Man1a2", "Kcnk2", "Akap13","Stxbp5l","Rapgef5", "Zbtb20", "Asph")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+P8
+P9
+P10
+P11
+P12
+P13
+P14
+P15
+P16
+P17
+P18
+P19
+P20
+P21
+P22
+P23
+P24
+P25
+P26
+P27
+P28
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Violin_plot_celltype7_markers_7celltype.pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+###############
+
+```{r}
+Cell_type<-rev(c("Type7", "Type4", "Type5", "Type3", "Type6", "Type1", "Type2"))
+gene_list<-c("Nptx1","Slit2", "Ifi203", "C1ql3", "Cdh13", "Cntn5", "Gpr37l1", "Pomc", "Pdgfra")
+
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E","#9B0C1E","#9B0C1E","#9B0C1E")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+P8
+P9
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Violin_plot_celltypemarkers347.pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+
+#########
+
+```{r}
+DefaultAssay(dCA2.integrated_clean_7celltype) <- "RNA"
+```
+
+
+
+"Nptx1","Slit2", "Ifi203", "C1ql3", "Cdh13", "Cntn5", "Gpr37l1", "Pomc", "Pdgfra"
+
+```{r}
+VlnPlot(object = dCA2.integrated_clean_7celltype, features = "Cntn4", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Nptx1.pdf", width=7,height=10)
+
+
+```
+
+
+
+
+
+
+
+
+###################################Saving R.data 08.06.2021#############################
+
+```{r}
+save.image(file="Working_R_Session_08062021.RData")
+```
+
+
+##################################comapring cell types 08.09.2021###################################################
+
+```{r}
+Cell_type<-c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7")
+
+Idents(object = dCA2.integrated) <- "type"
+```
+
+
+```{r}
+install.packages("openxlsx", dependencies=TRUE)
+library(openxlsx)
+
+wb <- createWorkbook()
+
+for (i in 1:length(Cell_type)){
+  tryCatch({
+    addWorksheet(wb, Cell_type[i])
+    one.markers <- FindConservedMarkers(dCA2.integrated, ident.1 = Cell_type[i], grouping.var = "Cell_type", print.bar = FALSE, min.cells.group = 1)
+    #A<-rowSums(as.matrix(dCA2.integrated@assays$RNA@data))
+    #A<-A[A>0]
+    #B<-as.data.frame(A)
+    #B<-rownames(B)
+    #genes<-B
+    #one.markers$dCA2_Mpos_p_val_adjust<-one.markers$dCA2_Mpos_p_val*length(genes)
+    #one.markers$dCA2_Fpos_p_val_adjust<-one.markers$dCA2_Fpos_p_val*length(genes)
+    #one.markers$FC_Mpos_p_val_adjust<-one.markers$FC_Mpos_p_val*length(genes)
+    #one.markers$FC_Fpos_p_val_adjust<-one.markers$FC_Fpos_p_val*length(genes)
+    #one.markers<-subset(one.markers,dCA2_Mpos_p_val_adjust<0.05 & dCA2_Fpos_p_val_adjust<0.05 & FC_Mpos_p_val_adjust<0.05 & FC_Fpos_p_val_adjust<0.05 & dCA2_Mpos_avg_logFC>0 & dCA2_Fpos_avg_logFC>0 & FC_Mpos_avg_logFC>0 & FC_Fpos_avg_logFC>0)
+    one.markers<-one.markers[order(-one.markers[,"Type1"]),]
+    writeData(wb, Cell_type[i] , one.markers, startRow = 1, startCol = 1)
+  }, error=function(e){})
+  
+}
+
+saveWorkbook(wb, file = "excel_test.xlsx", overwrite = TRUE)
+```
+
+
+####################################
+
+###########################violin plot with each cell type markers################################
+
+Violinplot for potassium channels, figure goes with cluster tree  
+```{r}
+Cell_type<-rev(c("Type5", "Type7", "Type4", "Type1", "Type6", "Type2", "Type3"))
+gene_list<-c("Zfp536", "Tac1", "Clu", "Mef2c", "Kcnk2", "Bdnf", "Amigo2", "Cpne7")
+```
+
+```{r}
+Cell_number <- NULL
+for (i in 1:length(Cell_type)){     
+                temp1 <- data.frame(type=factor(rep(Cell_type[i],sum(Cell_type[i]==Idents(dCA2.integrated_clean_7celltype)))))
+                temp2 <- as.data.frame(dCA2.integrated_clean_7celltype@assays$RNA@data[gene_list,Idents(dCA2.integrated_clean_7celltype)==Cell_type[i]])
+                temp3 <- cbind(temp1,t(temp2))
+                Cell_number <- rbind(temp3,Cell_number)
+}
+rownames(Cell_number) <- NULL
+```
+
+```{r}
+colors<-c("#ffc857","#ffc857","#ffc857","#9B0C1E", "#9B0C1E", "#9B0C1E", "#E8C6C7")
+```
+
+
+```{r}
+for (k in 1:length(gene_list))
+    {
+if (k==length(gene_list)){
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.text.x=element_text(size=5,face="bold")
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+else{
+assign(paste("P",k,sep=""),ggplot(Cell_number,aes_string(x="type",y=gene_list[k],fill="type"))+geom_violin(scale = "width")+scale_fill_manual(values=colors)
++stat_summary(fun=median, geom="point", size=0.6, color="red")+ylab(gene_list[k])+ theme(axis.title.x=element_blank(),
+axis.text.x=element_blank(),axis.text.y=element_text(size=5),axis.title.y=element_text(size=6,angle=0,face="bold",margin = margin(t = 10, r = 8, b = 0, l = 10),vjust=0.5),axis.ticks.x=element_blank(),axis.text=element_text(size=5)
+,axis.title=element_text(size=4,face="bold"),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"),legend.position="none",plot.margin = unit(c(0, 0,0, 0), "cm")))}
+ 
+}
+```
+
+```{r}
+P1
+P2
+P3
+P4
+P5
+P6
+P7
+```
+
+
+```{r}
+merge<-list()
+for (i in length(gene_list):1){  
+       if (length(merge)==0){
+        merge<-ggplotGrob(eval(parse(text=paste("P",i,sep = ""))))}else{merge<-rbind(ggplotGrob(eval(parse(text=paste("P",i,sep = "")))),merge,size = "last")}}
+ 
+ #all genes
+pdf(paste("/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/cellytype7.pdf",".pdf",sep=""),height=6, width=50 , paper = "letter")
+
+ 
+grid.newpage()
+grid.draw(merge)
+```
+
+
+#######################################################################################################
+########################################################################################################
+
+
+
+
+
+
+Identifying conserved markers for each cluster type
+
+```{r}
+load(file="Working_R_Session_051121.RData")
+```
+
+
+```{r}
+Cell_type<-c("Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7", "Type8", "Type9")
+Idents(object = dCA2.integrated) <- "type"
+```
+
+```{r}
+install.packages("openxlsx", dependencies=TRUE)
+library(openxlsx)
+
+wb <- createWorkbook()
+
+for (i in 1:length(Cell_type)){
+  tryCatch({
+    addWorksheet(wb, Cell_type[i])
+    one.markers <- FindConservedMarkers(dCA2.integrated, ident.1 = Cell_type[i], grouping.var = "protocol", print.bar = FALSE, min.cells.group = 1)
+    #A<-rowSums(as.matrix(dCA2.integrated@assays$RNA@data))
+    #A<-A[A>0]
+    #B<-as.data.frame(A)
+    #B<-rownames(B)
+    #genes<-B
+    #one.markers$dCA2_Mpos_p_val_adjust<-one.markers$dCA2_Mpos_p_val*length(genes)
+    #one.markers$dCA2_Fpos_p_val_adjust<-one.markers$dCA2_Fpos_p_val*length(genes)
+    #one.markers$FC_Mpos_p_val_adjust<-one.markers$FC_Mpos_p_val*length(genes)
+    #one.markers$FC_Fpos_p_val_adjust<-one.markers$FC_Fpos_p_val*length(genes)
+    #one.markers<-subset(one.markers,dCA2_Mpos_p_val_adjust<0.05 & dCA2_Fpos_p_val_adjust<0.05 & FC_Mpos_p_val_adjust<0.05 & FC_Fpos_p_val_adjust<0.05 & dCA2_Mpos_avg_logFC>0 & dCA2_Fpos_avg_logFC>0 & FC_Mpos_avg_logFC>0 & FC_Fpos_avg_logFC>0)
+    one.markers<-one.markers[order(-one.markers[,"dCA2_Mpos_avg_log2FC"]),]
+    writeData(wb, Cell_type[i] , one.markers, startRow = 1, startCol = 1,rowNames = TRUE)
+  }, error=function(e){})
+  
+}
+
+saveWorkbook(wb, file = "excel_test.xlsx", overwrite = TRUE)
+
+```
+
+###################################
+
+Heatmap 
+
+work on the codes from here...... once fixed line 730. 
+
+```{r}
+library(openxlsx)
+```
+
+```{r}
+Type1<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=1)
+Type1$FC_Mpos_avg_logFC<-as.numeric(paste(Type1$FC_Mpos_avg_log2FC))
+Type1<-subset(Type1,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type2<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=2)
+Type2$FC_Mpos_avg_logFC<-as.numeric(paste(Type2$FC_Mpos_avg_log2FC))
+Type2<-subset(Type2,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type3<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=3)
+Type3$FC_Mpos_avg_logFC<-as.numeric(paste(Type3$FC_Mpos_avg_log2FC))
+Type3<-subset(Type3,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type4<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=4)
+Type4$FC_Mpos_avg_logFC<-as.numeric(paste(Type4$FC_Mpos_avg_log2FC))
+Type4<-subset(Type4,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type5<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=5)
+Type5$FC_Mpos_avg_logFC<-as.numeric(paste(Type5$FC_Mpos_avg_log2FC))
+Type5<-subset(Type5,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type6<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=6)
+Type6$FC_Mpos_avg_logFC<-as.numeric(paste(Type6$FC_Mpos_avg_log2FC))
+Type6<-subset(Type6,FC_Mpos_avg_log2FC > 0.5)
+```
+
+
+```{r}
+Type7<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=7)
+Type7$FC_Mpos_avg_logFC<-as.numeric(paste(Type7$FC_Mpos_avg_log2FC))
+Type7<-subset(Type7,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type8<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=8)
+Type8$FC_Mpos_avg_logFC<-as.numeric(paste(Type8$FC_Mpos_avg_log2FC))
+Type8<-subset(Type8,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+Type9<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=9)
+Type9$FC_Mpos_avg_logFC<-as.numeric(paste(Type9$FC_Mpos_avg_log2FC))
+Type9<-subset(Type9,FC_Mpos_avg_log2FC > 0.5)
+```
+
+```{r}
+all_genes<-c(as.character(Type1[,1]),as.character(Type2[,1]),as.character(Type3[,1]), as.character(Type4[,1]), as.character(Type5[,1]), as.character(Type6[,1]), as.character(Type7[,1]), as.character(Type8[,1]),as.character(Type9[,1]) )
+length(all_genes)
+```
+########################
+For all DEG number 
+```{r}
+#Use openxlsx. It's much lighter, no java.
+Type1<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=1)
+dim(Type1)[1]
+Type2<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=2)
+dim(Type2)[1]
+Type3<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=3)
+dim(Type3)[1]
+```
+
+```{r}
+Type4<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=4)
+dim(Type4)[1]
+Type5<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=5)
+dim(Type5)[1]
+Type6<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=6)
+dim(Type6)[1]
+
+```
+
+```{r}
+Type7<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=7)
+dim(Type7)[1]
+Type8<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=8)
+dim(Type8)[1]
+Type9<-read.xlsx2(file="/Users/lees44/R_project/excel_test.xlsx",sheetIndex=9)
+dim(Type9)[1]
+```
+
+```{r}
+dim(Type1)[1]+dim(Type2)[1]+dim(Type3)[1]+dim(Type4)[1]+dim(Type5)[1]+dim(Type6)[1]+dim(Type7)[1]+dim(Type8)[1]+dim(Type9)[1]
+```
+
+######################################
+
+```{r}
+select<-numeric()
+for (i in 1:length(all_genes)){
+if(sum(all_genes==all_genes[i])==1){
+select<-c(select,i)}else{select<-select}
+}
+```
+
+```{r}
+Genes<-rev(unique(all_genes))
+Genes<-factor(Genes,levels=Genes)
+order<-c(Type1_barcode,Type2_barcode, Type3_barcode,  Type4_barcode,  Type5_barcode,  Type6_barcode,  Type7_barcode,  Type8_barcode,  Type9_barcode)
+order<-factor(order,levels=order)
+dCA2.data<-dCA2.integrated@assays$RNA@data[Genes,order]
+```
+
+```{r}
+dCA2.data<-t(scale(t(as.matrix(dCA2.data))))
+levels(rownames(dCA2.data))<-levels(Genes)
+levels(colnames(dCA2.data))<-levels(order)
+test.m <- melt(dCA2.data)
+```
+
+```{r}
+length(Type1_barcode)
+length(c(Type1_barcode,Type2_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode, Type7_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode, Type7_barcode, Type8_barcode))
+length(c(Type1_barcode,Type2_barcode, Type3_barcode, Type4_barcode, Type5_barcode, Type6_barcode, Type7_barcode, Type8_barcode, Type9_barcode))
+```
+
+```{r}
+p <- ggplot(test.m, aes(Var2, Var1)) + geom_tile(aes(fill =value))+ scale_fill_continuous(limits=c(-1, 4), breaks=seq(-1,4,by=
+1),low = "white",high = "blue", oob=squish)+scale_x_discrete(breaks=c(Type1_barcode[1], Type2_barcode[1], Type3_barcode[1], Type4_barcode[1], Type5_barcode[1],Type6_barcode[1],Type7_barcode[1],Type8_barcode[1],Type9_barcode[1]))
+
+# **colour = "white" at geom_tile may all white out the figure 
+pp<-p+ylab("Genes")+xlab("Cells")+theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.title=element_text(size=20,face="bold"),plot.title = element_text(size=16),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black", size = 0.1),axis.ticks.y = element_blank())+ggtitle("DEGs")
+print(pp)
+```
+
+####################
+
+
+
+```{r}
+
+Oligo<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Oligodendrocyte_gene.xlsx",sheetIndex=1)
+Oligo$Fpos_avg_logFC<-as.numeric(paste(Oligo$Fpos_avg_logFC))
+Oligo<-subset(Oligo,Fpos_avg_logFC > 0.5)
+Neuron<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Neuron_gene.xlsx",sheetIndex=1)
+Neuron$Fpos_avg_logFC<-as.numeric(paste(Neuron$Fpos_avg_logFC))
+Neuron<-subset(Neuron,Fpos_avg_logFC > 0.5)
+Pericyte<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Pericyte_gene.xlsx",sheetIndex=1)
+Pericyte$Fpos_avg_logFC<-as.numeric(paste(Pericyte$Fpos_avg_logFC))
+Pericyte<-subset(Pericyte,Fpos_avg_logFC > 0.5)
+```
+
+```{r}
+all_genes<-c(as.character(Neuron[,1]),as.character(Oligo[,1]),as.character(Pericyte[,1]))
+length(all_genes)
+```
+
+```{r}
+#all DEG number
+Oligo<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Oligodendrocyte_gene.xlsx",sheetIndex=1)
+dim(Oligo)[1]
+Neuron<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Neuron_gene.xlsx",sheetIndex=1)
+dim(Neuron)[1]
+Pericyte<-read.xlsx2(file="/Users/lees44/R_project/SUN1GFP_MYC_CREREV38354884_OUTPUT/conserved_markers_type/Pericyte_gene.xlsx",sheetIndex=1)
+dim(Pericyte)[1]
+```
+
+```{r}
+dim(Oligo)[1]+dim(Neuron)[1]+dim(Pericyte)[1]
+```
+
+```{r}
+select<-numeric()
+for (i in 1:length(all_genes)){
+if(sum(all_genes==all_genes[i])==1){
+select<-c(select,i)}else{select<-select}
+}
+```
+
+```{r}
+Genes<-rev(unique(all_genes))
+Genes<-factor(Genes,levels=Genes)
+order<-c(Neuron_barcode,Oligo_barcode, Pericyte_barcode)
+order<-factor(order,levels=order)
+dCA2.data<-dCA2.integrated@assays$RNA@data[Genes,order]
+```
+
+```{r}
+dCA2.data<-t(scale(t(as.matrix(dCA2.data))))
+levels(rownames(dCA2.data))<-levels(Genes)
+levels(colnames(dCA2.data))<-levels(order)
+test.m <- melt(dCA2.data)
+```
+
+```{r}
+length(Neuron_barcode)
+length(c(Neuron_barcode,Oligo_barcode))
+length(c(Neuron_barcode,Oligo_barcode, Pericyte_barcode))
+
+
+```
+
+```{r}
+p <- ggplot(test.m, aes(Var2, Var1)) + geom_tile(aes(fill =value))+ scale_fill_continuous(limits=c(-1, 4), breaks=seq(-1,4,by=
+1),low = "white",high = "blue", oob=squish)+scale_x_discrete(breaks=c(Neuron_barcode[1], Oligo_barcode[1], Pericyte_barcode[1]))
+
+# **colour = "white" at geom_tile may all white out the figure 
+pp<-p+ylab("Genes")+xlab("Cells")+theme(axis.text.x=element_blank(),axis.text.y=element_blank(),axis.title=element_text(size=20,face="bold"),plot.title = element_text(size=16),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black", size = 0.1),axis.ticks.y = element_blank())+ggtitle("DEGs")
+print(pp)
+```
+#############################################################################################################################################################################################################################################################
+#############################RNA assay for DEG expression 081621##############################################################
+
+switched back to RNA from integrated assay for gene analysis 08.13.21
+
+```{r}
+DefaultAssay(dCA2.integrated_clean_7celltype) <- "RNA"
+```
+
+
+```{r}
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+combined_markers_clean_7celltype <- FindAllMarkers(object = dCA2.integrated_clean_7celltype, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+View(combined_markers_clean_7celltype)        
+
+# Save markers to file
+write.csv(combined_markers_clean_7celltype, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean_7celltype_RNAassay.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+```
+
+
+```{r}
+# Extract top 50 markers per cluster
+top50_comb <- combined_markers_clean_7celltype %>%
+        group_by(cluster) %>%
+        top_n(n = 50,
+              wt = avg_log2FC)
+
+# Visualize top 50 markers per cluster
+View(top50_comb)
+
+# Save markers to file
+write.csv(combined_markers_clean_7celltype, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/top50_markers_clean_7celltypes_RNAassay.csv", 
+          quote = FALSE, 
+          row.names = FALSE)
+
+```
+
+
+##############################################################################
+Heatmap for different cell types from combined markers for clean 7 cell types 
+
+DoHeatmap generates an expression heatmap for given cells and features. In this case, we are plotting the top 20 markers (or all markers if less than 20) for each cluster.
+https://satijalab.org/seurat/archive/v3.2/pbmc3k_tutorial.html
+
+####################scale data after subsetting 08.13.21##########################
+
+```{r}
+dCA2.integrated_clean_7celltype_RNAassay<- NormalizeData(object = dCA2.integrated_clean_7celltype,verbose = FALSE) 
+```
+
+```{r}
+dCA2.integrated_clean_7celltype_RNAassay <- ScaleData(object = dCA2.integrated_clean_7celltype_RNAassay, vars.to.regress = c("nCount_RNA", "percent.mito"),verbose = FALSE)
+```
+
+
+```{r}
+combined_markers_clean_7celltype %>%
+    group_by(cluster) %>%
+    top_n(n = 20, wt = avg_log2FC) -> top20
+DoHeatmap(dCA2.integrated_clean_7celltype_RNAassay, features = top20$gene) + NoLegend()
+
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/heatmap_top20_celltype_clean_7celltypes_RNAassay.pdf",width=50,height=25, limitsize = FALSE)
+```
+
+##########################################
+Dot plot for Top 10 markers from combined markers subset clean 7 cell types
+
+https://blog.dolomite-bio.com/visualization-of-single-cell-data-from-seurat-object-to-umap/
+
+Change font and dot size
+
+https://satijalab.org/seurat/reference/seurattheme
+
+```{r}
+#subset clean markers 7 cell type
+features <- c("Man1a2", "Kcnk2", "Akap13", "Asph", "Ptpn5", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Stxbp5l", "Rapgef5", "Dapk1", "Ntsr2", "Epha10", "Hdac7", "St8sia6", "Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Neto1", "Cpeb1", "Parp8", "Nptx1", "Cdh24", "Slit2", "C1ql3", "Adarb2", "Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Cdh13", "Cit", "Cald1", "Ptgds","Gjc3","Mag", "Mbp", "Plp1", "Car2", "Septin7","Il1rap", "Ptn", "Tac1", "Pde10a", "Ntrk2", "Nr4a2", "Zdbf2", "Chgb", "Tent5a", "Adamts1", "Scg2", "Atp1a2", "Apoe", "Clu", "Enpp2", "Cspg5", "Slc1a2", "Cst3", "Ptprz1", "Ttr", "Qk")
+```
+
+
+```{r}
+DotPlot(dCA2.integrated_clean_7celltype, features = features) + RotatedAxis() + scale_size(range = c(1, 20))  + FontSize(x.text = 30, y.text = 30)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dotplot_top10_celltype_clean_7celltypes.pdf", width=50, height=25, limitsize = FALSE)
+```
+
+###########subset clean markers 7 cell type dotplot as list top#20 markers####################
+
+generating excel table for the 7 cell types aligned to each other 
+
+see: https://github.com/satijalab/seurat/issues/1888
+
+```{r}
+#subset clean markers 7 cell type dotplot as list top#20 markers
+ my_genes <- c("Man1a2", "Kcnk2", "Akap13", "Stxbp5l", "Ptpn5", "Ptprd", "Asph", "Nebl", "Amigo2", "Sms", "Pygo1", "Sox5", "Zdhhc23", "Srgap2", "Rap2b", "Pycr2", "Pkp2", "mt−Cytb", "mt−Co3", "Rapgef5", "Wipf3", "Dapk1", "Adcy1", "Ntsr2", "Epha10", "Hdac7", "Echdc2", "Large1", "Atp11b", "Fat3", "Zbtb1", "St8sia6", "Fkbp5", "Dnah9","Vcan", "Opcml", "Ccnd2", "Rnf182", "Nectin3", "Cpne7", "Cpne6",  "Neto1", "Slc1a2", "Peak1", "Cpeb1", "Parp8", "Nptx1", "Raver2", "Cdh24","Slit2", "Oxr1", "Marchf1", "Scube1", "Lnx1", "Trps1", "C1ql3", "Cntn5", "Cntnap5a", "Adarb2", "Dock10","Ptchd4", "Ntng1", "Tenm1", "Mef2c", "Ncam1","Cdh13", "Pdzd2", "Cers4","Cit", "Dgkh", "Cald1", "Bsg", "Ptgds", "Lrrtm3", "Gjc3","Mag", "Sytl2", "Cnp", "Mobp", "Mbp", "Plp1", "Car2", "Scd2", "Lcorl", "Septin4", "Smad7", "Septin7","Il1rap", "Ptn", "Qk", "Tac1", "Zfp536", "Pde10a", "Ntrk2", "Nr4a2", "Bdnf", "Nr4a3",  "Zdbf2", "Dclk1", "Chgb", "Fosl2", "Tent5a", "Cwc25", "Adamts1", "Btg2", "Alkal2", "Npas4", "Homer1", "Tbc1d1", "Pam","Scg2", "Atp1a2", "Slc1a3", "Apoe", "Plpp3", "Phkg1", "Clu", "Acsl3","Enpp2", "Ntm", "Cspg5", "Cst3", "Sparcl1", "Msi", "Ptprz1", "Ttyh1", "Ttr")
+a <- DotPlot(dCA2.integrated_clean_7celltype, features = my_genes)
+a$data
+
+# Save markers to file
+write.csv(a$data, 
+          file = "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/combined_all_markers_clean_7celltype_avg_exp.csv", 
+          quote = TRUE, 
+          row.names = TRUE)
+```
+
+Gene expression with RNAassay
+
+```{r}
+#Tac1
+FeaturePlot(object =dCA2.integrated_clean_7celltype_RNAassay, features =  c("Tac1"), blend.threshold = 0.5, min.cutoff = 0, max.cutoff = 2, pt=1) + scale_fill_continuous(type= "viridis")
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/clean_7celltype_Tac1_color_viridis_RNAasay.pdf",width=10,height=10)
+```
+
+
+
+
+##############################################################################################################################
+##############################################################################################################################
+##################################
+
+```{r}
+DefaultAssay(dCA2.integrated) <- "RNA"
+```
+
+Generalized dCA2 vs FC 
+
+Differential expression testing: see https://satijalab.org/seurat/archive/v3.1/de_vignette.html
+https://satijalab.org/seurat/reference/findmarkers
+
+```{r}
+dCA2.integrated@meta.data$Group = "no"
+dCA2.integrated@meta.data$Group[dCA2.integrated@meta.data$protocol == "dCA2_Fpos" | dCA2.integrated@meta.data$protocol == "dCA2_Mpos"] = "dCA2"
+dCA2.integrated@meta.data$Group[dCA2.integrated@meta.data$protocol == "FC_Fpos" | dCA2.integrated@meta.data$protocol == "FC_Mpos"] = "FC"
+
+table(dCA2.integrated@meta.data$Group)
+
+Idents(object = dCA2.integrated) <- "Group"
+
+dCA2vsFC.markers <- FindMarkers(dCA2.integrated, ident.1 = "FC" , ident.2 = "dCA2", min.pct = 0.25)
+head(dCA2vsFC.markers, n = 10)
+write.csv(dCA2vsFC.markers, "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FCvsdCA2top_10markers_integrated.csv")
+```
+
+```{r}
+write.csv(dCA2vsFC.markers, "/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/top_10markers_RNAassay.csv", quote = F)
+```
+
+```{r}
+p3<-DimPlot(dCA2.integrated, reduction = "umap", group.by = "Group", pt=1)
+plot_grid(p3)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_UMAP_Group.pdf",width=10,height=10)
+```
+
+```{r}
+p4<-DimPlot(dCA2.integrated, reduction = "umap", split.by = "Group",  pt=1)
+plot_grid(p4)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC_dCA2_UMAP_Group_split.pdf",width=10,height=10)
+```
+
+##################
+Violin plot for genes in dCA2 vs FC 
+see https://ggplot2.tidyverse.org/reference/theme.html
+changing graph using ggplot theme
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Scn1a", pt.size = 0.5) +theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Scn1a_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Cpne7", pt.size = 0.5)+theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Cpne7_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Ptgds", pt.size = 0.5)+theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Ptgds_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Ttr", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Ttr_FCvsCA2.pdf", width=7,height=10)
+```
+
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Apoe", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Apoe_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Mef2c", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Mef2c_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Tac1", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Tac1_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Zfp536", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Zfp536_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Igfbp4", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Igfbp4_FCvsCA2.pdf", width=7,height=10)
+```
+
+```{r}
+VlnPlot(object = dCA2.integrated, features = "Ntng1", pt.size = 0.5) + theme(title = element_text(size = 30), axis.title.x = element_text(size =20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), legend.text = element_text(size =20))
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/Ntng1_FCvsCA2.pdf", width=7,height=10)
+```
+
+
+```{r}
+average<-(AverageExpression(object = dCA2.integrated, features = "Scn1a", group.by = "Group"))
+average
+```
+
+
+```{r}
+AverageExpression(dCA2.integrated, ident.1 = "dCA2", ident.2 = "FC", features = "Scn1a")
+```
+
+################################################
+plot by subsetting by sex within the region 08122021
+
+```{r}
+dCA2.integrated@meta.data$Sex = "no"
+dCA2.integrated@meta.data$Sex[dCA2.integrated@meta.data$protocol == "dCA2_Fpos"] = "dCA2 female"
+dCA2.integrated@meta.data$Sex[dCA2.integrated@meta.data$protocol == "dCA2_Mpos"] = "dCA2 male"
+dCA2.integrated@meta.data$Sex[dCA2.integrated@meta.data$protocol == "FC_Fpos"] = "FC female"
+dCA2.integrated@meta.data$Sex[dCA2.integrated@meta.data$protocol == "FC_Mpos"] = "FC male"
+table(dCA2.integrated@meta.data$Sex)
+
+Idents(object = dCA2.integrated) <- "Sex"
+```
+
+```{r}
+dCA2_subsetbysex <- subset(x = dCA2.integrated, idents = c("FC female", "FC male"), invert = TRUE)
+p4<-DimPlot(dCA2_subsetbysex, reduction = "umap", group.by = "Sex", pt=1)
+plot_grid(p4)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dCA2_UMAP_by_sex.pdf",width=10,height=10)
+```
+
+```{r}
+p5<-DimPlot(dCA2_subsetbysex, reduction = "umap", split.by = "Sex", pt=1)
+plot_grid(p5)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/dCA2_UMAP_splitby_sex.pdf",width=10,height=10)
+```
+
+```{r}
+FC_subsetbysex <- subset(x = dCA2.integrated, idents = c("dCA2 female", "dCA2 male"), invert = TRUE)
+p4<-DimPlot(FC_subsetbysex, reduction = "umap", group.by = "Sex", pt=1)
+plot_grid(p4)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC2_UMAP_by_sex.pdf",width=10,height=10)
+```
+
+```{r}
+p5<-DimPlot(FC_subsetbysex, reduction = "umap", split.by = "Sex", pt=1)
+plot_grid(p5)
+ggsave(file="/Users/lees44/R_project/FC_vs_dCA2_comparison_vector_integration_042821/FC2_UMAP_splitby_sex.pdf",width=10,height=10)
+```
+
+```{r}
+Idents(object = dCA2.integrated) <- "Type"
+```
+
+
+#############################################################################################################
+
