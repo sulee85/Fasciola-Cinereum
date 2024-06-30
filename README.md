@@ -1,5 +1,5 @@
 # Investigation of the Fasciola Cinereum, Absent in BTBR mice, and Comparison with the Hippocampal Area CA2
-Su Hyun Lee, Michaela E Cooke, Kai Zheng Duan,  View ORCID ProfileSarah K Williams Avram, June Song, Abdel G Elkahloun, George McGrady, NISC Comparative Sequencing Program, Austin Howley, Babru Samal, W. Scott Young
+Su Hyun Lee, Michaela E Cooke, Kai Zheng Duan, Sarah K Williams Avram, June Song, Abdel G Elkahloun, George McGrady, NISC Comparative Sequencing Program, Austin Howley, Babru Samal, W. Scott Young
 
 doi: https://doi.org/10.1101/2024.03.21.586108
 
